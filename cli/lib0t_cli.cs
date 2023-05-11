@@ -1,58 +1,67 @@
 ﻿using core;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using lib0t;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace cli
 {
     internal class lib0t_cli
     {
         private ServerCore server { get; set; }
-        //private RenderTargetBitmap FileToSizedImageSource(String file, int width, int height)
-        //{
-        //    byte[] data = File.ReadAllBytes(file);
-        //    return this.FileToSizedImageSource(data, width, height);
-        //}
-        //private RenderTargetBitmap FileToSizedImageSource(byte[] data, int width, int height)
-        //{
-        //    RenderTargetBitmap resizedImage = new RenderTargetBitmap(width, height, 96, 96);
-        //    using (MemoryStream ms = new MemoryStream(data))
-        //    {
-        //        BitmapImage img = new BitmapImage();
-        //        img.BeginInit();
-        //        img.StreamSource = ms;
-        //        img.EndInit();
-        //        Rect rect = new Rect(0, 0, width, height);
-        //        DrawingVisual drawingVisual = new DrawingVisual();
+        private byte[] FileToSizedImageSource(String file, int width, int height)
+        {
+            byte[] data = File.ReadAllBytes(file);
+            return this.FileToSizedImageSource(data, width, height);
+        }
+        private byte[] Compress(byte[] data)
+        {
+            byte[] result = null;
 
-        //        using (DrawingContext drawingContext = drawingVisual.RenderOpen())
-        //            drawingContext.DrawImage(img, rect);
+            using (MemoryStream ms = new MemoryStream())
+            using (Stream s = new DeflaterOutputStream(ms))
+            {
+                s.Write(data, 0, data.Length);
+                s.Close();
+                result = ms.ToArray();
+            }
 
-        //        resizedImage.Render(drawingVisual);
-        //    }
-
-        //    return resizedImage;
-        //}
-        //private byte[] BitmapSourceToArray(BitmapSource img)
-        //{
-        //    byte[] result;
-
-        //    using (MemoryStream ms = new MemoryStream())
-        //    {
-        //        JpegBitmapEncoder encoder = new JpegBitmapEncoder();
-        //        encoder.Frames.Add(BitmapFrame.Create(img));
-        //        encoder.Save(ms);
-        //        result = ms.ToArray();
-        //    }
-
-        //    return result;
-        //}
+            return result;
+        }
+        private byte[] FileToSizedImageSource(byte[] data, int x, int y)
+        {
+            byte[] result = null;
+            using (MemoryStream memoryStream = new MemoryStream(data))
+            {
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                memoryStream.Position = 0;
+                var raw = Image.Load(memoryStream);
+                var clone = raw.Clone(context => context
+                            .Resize(new ResizeOptions
+                            {
+                                Mode = ResizeMode.Max,
+                                Size = new Size(x, y)
+                            }));
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    ms.Position = 0;
+                    clone.Save(ms, new PngEncoder { CompressionLevel = PngCompressionLevel.DefaultCompression });
+                    byte[] img_buffer = ms.ToArray();
+                    result = Compress(img_buffer);
+                }
+            }
+            return result;
+        }
         private void CreateImporter1()
         {
             String path = Reginux.Sb0tunixPath + "/TEMPLATE IMPORTER";
@@ -158,36 +167,42 @@ namespace cli
             Reginux.SaveAppSettings();
             try
             {
-                String path = Reginux.Sb0tunixPath+"/Avatars/server";
+                String path = Reginux.Sb0tunixPath+"/Avatars/server.png";
 
-                //if (File.Exists(path))
-                //{
-                //    RenderTargetBitmap resizedImage = this.FileToSizedImageSource(path, 90, 90);
-                //    byte[] data = this.BitmapSourceToArray(resizedImage);
-                //    Avatars.UpdateServerAvatar(data);
-                //}
+                if (File.Exists(path))
+                {
+                    byte[] data = this.FileToSizedImageSource(path, 90, 90);
+                    if(data!=null)
+                    Avatars.UpdateServerAvatar(data);
+                }
             }
-            
+
             catch (Exception e){
                 throw (e);
             }
             try
             {
-                String path = Reginux.Sb0tunixPath + "/Avatars/default";
-                //if (File.Exists(path))
-                //{
-                //    RenderTargetBitmap resizedImage = this.FileToSizedImageSource(path, 90, 90);
-                //    byte[] data = this.BitmapSourceToArray(resizedImage);
-                //    Avatars.UpdateDefaultAvatar(data);
-                //}
+                String path = Reginux.Sb0tunixPath + "/Avatars/default.png";
+                if (File.Exists(path))
+                {
+                    byte[] data = this.FileToSizedImageSource(path, 90, 90);
+                    Avatars.UpdateDefaultAvatar(data);
+                }
             }
             catch (Exception e)
             {
                 throw (e);
             }
             if (!this.server.Open())
+            {
                 Environment.Exit(0);
-            Console.WriteLine("Sala {0} creada con éxito con puerto {1}", Reginux.appSettings.MainSettings.roomName, Reginux.appSettings.MainSettings.roomPort);
+            }
+            else
+            {
+                Console.WriteLine("Sala {0} creada con éxito con puerto {1}", Reginux.appSettings.MainSettings.roomName, Reginux.appSettings.MainSettings.roomPort);
+
+            }
+
         }
         static void Main(string[] args)
         {

@@ -25,6 +25,7 @@ using System.Drawing;
 using System.Globalization;
 using core.ib0t;
 using iconnect;
+using Color = SixLabors.ImageSharp.Color;
 
 namespace core
 {
@@ -71,9 +72,9 @@ namespace core
 
             for (int i = 0; i < acols.Length; i++)
             {
-                double d = Math.Sqrt(Math.Pow((r - acols[i].R), 2) +
-                                     Math.Pow((g - acols[i].G), 2) +
-                                     Math.Pow((b - acols[i].B), 2));
+                double d = Math.Sqrt(Math.Pow((r - byte.Parse(acols[i].ToHex().Substring(0, 2))), 2) +
+                                     Math.Pow((g - byte.Parse(acols[i].ToHex().Substring(2, 2))), 2) +
+                                     Math.Pow((b - byte.Parse(acols[i].ToHex().Substring(4, 2))), 2));
 
                 if (d < closest)
                 {

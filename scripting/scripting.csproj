@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\iconnect\iconnect.csproj" />
+    <ProjectReference Include="..\lib0t\lib0t.csproj" />
   </ItemGroup>
 
 </Project>

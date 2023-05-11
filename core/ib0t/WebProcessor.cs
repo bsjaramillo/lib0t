@@ -26,10 +26,11 @@ using System.Security.Cryptography;
 using captcha;
 using iconnect;
 using System.IO;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Windows;
+using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace core.ib0t
 {
@@ -142,7 +143,7 @@ namespace core.ib0t
         {
             byte[] result = null;
             int x, y;
-            using (Bitmap avatar_raw = new Bitmap(new MemoryStream(raw)))
+            using (var avatar_raw = Image.Load(new MemoryStream(raw)))
             {
                 int img_x = avatar_raw.Width;
                 int img_y = avatar_raw.Height;
@@ -159,24 +160,17 @@ namespace core.ib0t
                 }
                 x = img_x;
                 y = img_y;
-
-                using (Bitmap avatar_sized = new Bitmap(img_x, img_y))
+                var clone = avatar_raw.Clone(context => context
+                            .Resize(new ResizeOptions
+                            {
+                                Mode = ResizeMode.Max,
+                                Size = new Size(x, y)
+                            }));
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    using (Graphics g = Graphics.FromImage(avatar_sized))
-                    {
-                        using (SolidBrush sb = new SolidBrush(Color.White))
-                            g.FillRectangle(sb, new Rectangle(0, 0, img_x, img_y));
-
-                        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        g.DrawImage(avatar_raw, new RectangleF(0, 0, img_x, img_y));
-
-                        using (MemoryStream ms = new MemoryStream())
-                        {
-                            avatar_sized.Save(ms, ImageFormat.Jpeg);
-                            byte[] img_buffer = ms.ToArray();
-                            result = Zip.Compress(img_buffer);
-                        }
-                    }
+                   clone.Save(ms, new JpegEncoder { Quality = 100 });
+                    byte[] img_buffer = ms.ToArray();
+                    result = Zip.Compress(img_buffer);
                 }
             }
             return new Tuple<byte[], int, int>(result, x, y);

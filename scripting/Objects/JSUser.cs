@@ -38,7 +38,7 @@ namespace scripting.Objects
         }
 
         public JSUser(ObjectInstance prototype, IUser user, String script)
-            : base(prototype.Engine, ((ClrFunction)prototype.Engine.Global["User"]).InstancePrototype)
+            : base(prototype)
         {
             this.PopulateFunctions();
             this.parent = user;

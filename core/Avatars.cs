@@ -20,10 +20,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace core
 {
@@ -106,29 +105,21 @@ namespace core
         {
             byte[] result;
 
-            using (MemoryStream raw_ms = new MemoryStream(raw))
-            using (Bitmap raw_bmp = new Bitmap(raw_ms))
-            using (Bitmap sized = new Bitmap(48, 48))
-            using (Graphics g = Graphics.FromImage(sized))
+            using (var avatar_raw = Image.Load(new MemoryStream(raw)))
             {
-                using (SolidBrush sb = new SolidBrush(Color.White))
-                    g.FillRectangle(sb, new Rectangle(0, 0, 48, 48));
-
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.CompositingQuality = CompositingQuality.HighQuality;
-                g.SmoothingMode = SmoothingMode.HighQuality;
-                g.DrawImage(raw_bmp, new Rectangle(0, 0, 48, 48));
-                ImageCodecInfo info = new List<ImageCodecInfo>(ImageCodecInfo.GetImageEncoders()).Find(x => x.MimeType == "image/jpeg");
-                EncoderParameters encoding = new EncoderParameters();
-                encoding.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 69L);
-
+                var clone = avatar_raw.Clone(context => context
+                            .Resize(new ResizeOptions
+                            {
+                                Mode = ResizeMode.Max,
+                                Size = new Size(48, 48)
+                            }));
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    sized.Save(ms, info, encoding);
-                    result = ms.ToArray();
+                    clone.Save(ms, new JpegEncoder { Quality = 100 });
+                    byte[] img_buffer = ms.ToArray();
+                    result = img_buffer;
                 }
             }
-
             return result;
         }
     }
