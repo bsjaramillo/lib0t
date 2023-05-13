@@ -127,10 +127,12 @@ namespace scripting
         {
             if (this.CanScript)
             {
+                
                 ScriptManager.Scripts.ForEach(x =>
                 {
                     if (!client.Link.IsLinked)
                     {
+                        
                         x.local_users.RemoveAll(z => z.Name == client.Name);
                         x.local_users.Add(new Objects.JSUser(x.JS.Object.InstancePrototype, client, x.ScriptName));
                     }
@@ -1180,13 +1182,20 @@ namespace scripting
                     if (u != null)
                         try
                         {
+                            System.Diagnostics.Debug.WriteLine(cmd+u.Name+args);
                             s.JS.CallGlobalFunction("onCommand", u, cmd, t, args);
+                            System.Diagnostics.Debug.WriteLine(cmd);
                         }
                         catch (Jurassic.JavaScriptException e)
                         {
+                            System.Diagnostics.Debug.WriteLine(e.Message);
+
                             ErrorDispatcher.SendError(s.ScriptName, e.Message, e.LineNumber);
                         }
-                        catch { }
+                        catch(Exception e) {
+                            System.Diagnostics.Debug.WriteLine(e.Message);
+
+                        }
                 }
             }
         }

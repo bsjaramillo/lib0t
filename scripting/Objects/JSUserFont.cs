@@ -33,6 +33,7 @@ namespace scripting.Objects
         public JSUserFont(ObjectInstance prototype, IUser user, String script)
             : base(prototype.Engine, ((ClrFunction)prototype.Engine.Global["UserFont"]).InstancePrototype)
         {
+            
             this.PopulateFunctions();
             this.parent = user;
         }
@@ -40,6 +41,7 @@ namespace scripting.Objects
         internal JSUserFont(ScriptEngine eng)
             : base(eng)
         {
+            
             this.PopulateFunctions();
 
             DefineProperty(Engine.Symbol.ToString(), new PropertyDescriptor("UserFont", PropertyAttributes.Sealed), true);

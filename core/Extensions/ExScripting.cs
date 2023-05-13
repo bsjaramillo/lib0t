@@ -38,7 +38,7 @@ namespace core.Extensions
 
         public byte ScriptLevel
         {
-            get { return Settings.Get<byte>("scriptingLevel", "AdvancedSettings"); }
+            get { return Convert.ToByte(Settings.Get<int>("scriptingLevel", "AdvancedSettings")); }
         }
     }
 }

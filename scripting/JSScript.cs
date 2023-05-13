@@ -24,6 +24,9 @@ using System.Reflection;
 using Jurassic;
 using Jurassic.Library;
 using iconnect;
+using scripting.ObjectPrototypes;
+using scripting.Statics;
+using scripting.Instances;
 
 namespace scripting
 {
@@ -34,7 +37,52 @@ namespace scripting
         public List<Objects.JSUser> local_users = new List<Objects.JSUser>();
         public List<Objects.JSLeaf> leaves = new List<Objects.JSLeaf>();
         public List<ulong> timer_idents = new List<ulong>();
-
+        private void SetJSGlobalValues()
+        {
+            this.JS.SetGlobalValue("Base64", new JSBase64(this.JS));
+            this.JS.SetGlobalValue("Channels", new JSChannels(this.JS));
+            this.JS.SetGlobalValue("Crypto", new JSCrypto(this.JS));
+            this.JS.SetGlobalValue("Entities", new JSEntities(this.JS));
+            this.JS.SetGlobalValue("File", new JSFile(this.JS));
+            this.JS.SetGlobalValue("Hashlink", new JSHashlink(this.JS));
+            this.JS.SetGlobalValue("Link", new JSLink(this.JS));
+            this.JS.SetGlobalValue("Registry", new JSRegistry(this.JS));
+            this.JS.SetGlobalValue("Room", new JSRoom(this.JS));
+            this.JS.SetGlobalValue("ScriptInclude", new JSScriptInclude(this.JS));
+            this.JS.SetGlobalValue("Spelling", new JSSpelling(this.JS));
+            this.JS.SetGlobalValue("Stats", new JSStats(this.JS));
+            this.JS.SetGlobalValue("Users", new JSUsers(this.JS));
+            this.JS.SetGlobalValue("Zip", new JSZip(this.JS));
+            this.JS.SetGlobalValue("Avatar", new JSAvatar(this.JS));
+            this.JS.SetGlobalValue("HttpRequest", new JSHttpRequest(this.JS));
+            this.JS.SetGlobalValue("List", new JSList(this.JS));
+            this.JS.SetGlobalValue("ProxyCheck", new JSProxyCheck(this.JS));
+            this.JS.SetGlobalValue("Query", new JSQuery(this.JS));
+            this.JS.SetGlobalValue("Scribble", new JSScribble(this.JS));
+            this.JS.SetGlobalValue("Sql", new JSSql(this.JS));
+            this.JS.SetGlobalValue("Timer", new JSTimer(this.JS));
+            this.JS.SetGlobalValue("XmlParser", new JSXmlParser(this.JS));
+            this.JS.SetGlobalValue("AvatarImage", new JSAvatarImage(this.JS));
+            this.JS.SetGlobalValue("BannedUser", new JSBannedUser(this.JS));
+            this.JS.SetGlobalValue("Channel", new JSChannel(this.JS));
+            this.JS.SetGlobalValue("ChannelCollection", new JSChannelCollection(this.JS));
+            this.JS.SetGlobalValue("CryptoResult", new JSCryptoResult(this.JS));
+            this.JS.SetGlobalValue("HashlinkResult", new JSHashlinkResult(this.JS));
+            this.JS.SetGlobalValue("HttpRequestResult", new JSHttpRequestResult(this.JS));
+            this.JS.SetGlobalValue("IgnoreCollection", new JSIgnoreCollection(this.JS));
+            this.JS.SetGlobalValue("Leaf", new JSLeaf(this.JS));
+            this.JS.SetGlobalValue("Node", new JSNode(this.JS));
+            this.JS.SetGlobalValue("NodeAttributes", new JSNodeAttributes(this.JS));
+            this.JS.SetGlobalValue("NodeCollection", new JSNodeCollection(this.JS));
+            this.JS.SetGlobalValue("PM", new JSPM(this.JS));
+            this.JS.SetGlobalValue("ProxyCheckResult", new JSProxyCheckResult(this.JS));
+            this.JS.SetGlobalValue("Record", new JSRecord(this.JS));
+            this.JS.SetGlobalValue("RegistryKeyCollection", new JSRegistryKeyCollection(this.JS));
+            this.JS.SetGlobalValue("ScribbleImage", new JSScribbleImage(this.JS));
+            this.JS.SetGlobalValue("SpellingSuggestionCollection", new JSSpellingSuggestionCollection(this.JS));
+            this.JS.SetGlobalValue("User", new JSUser(this.JS));
+            this.JS.SetGlobalValue("UserFont", new JSUserFont(this.JS));
+        }
         public JSScript(String name)
         {
             this.ScriptName = name;
@@ -42,22 +90,32 @@ namespace scripting
             //this.JS.UserData = name;
             //this.JS.EnableDebugging = true;
             Type[] types = Assembly.GetExecutingAssembly().GetTypes();
-
+            this.SetJSGlobalValues();
             // set up global functions
-            //this.JS.EmbedGlobalClass(typeof(JSGlobal));
-            
+            //this.JS.Embed.EmbedGlobalClass(typeof(JSGlobal));
+
             //set up static classes
-            var statics = types.Where(x => x.Namespace == "scripting.Statics" && x.IsSubclassOf(typeof(ObjectInstance)));
-            //this.JS.EmbedStatics(statics.ToArray());
-
-            //set up instance classes
-            var instances = types.Where(x => x.Namespace == "scripting.Instances" && x.IsSubclassOf(typeof(ClrFunction)));
-            //this.JS.EmbedInstances(instances.ToArray());
-
-            //set up object prototypes
-            var protos = types.Where(x => x.Namespace == "scripting.ObjectPrototypes" && x.IsSubclassOf(typeof(ClrFunction)));
-            //this.JS.EmbedObjectPrototypes(protos.ToArray());
-
+            //var statics = types.Where(x => x.Namespace == "scripting.Statics" && x.IsSubclassOf(typeof(ObjectInstance)));
+            //foreach (var s in statics.ToArray())
+            //{
+            //    System.Diagnostics.Debug.WriteLine(String.Format("this.JS.SetGlobalValue(\"{0}\",new {1}(this.JS));", s.Name.Substring(2), s.Name));
+            //}
+            ////this.JS.EmbedStatics(statics.ToArray());
+            ////this.JS.SetGlobalValue("UserFont", new JSUserFont(this.JS));
+            ////set up instance classes
+            //var instances = types.Where(x => x.Namespace == "scripting.Instances" && x.IsSubclassOf(typeof(ClrFunction)));
+            ////this.JS.EmbedInstances(instances.ToArray());
+            //foreach (var s in instances.ToArray())
+            //{
+            //    System.Diagnostics.Debug.WriteLine(String.Format("this.JS.SetGlobalValue(\"{0}\",new {1}(this.JS));", s.Name.Substring(2), s.Name));
+            //}
+            ////set up object prototypes
+            //var protos = types.Where(x => x.Namespace == "scripting.ObjectPrototypes" && x.IsSubclassOf(typeof(ClrFunction)));
+            ////this.JS.EmbedObjectPrototypes(protos.ToArray());
+            //foreach (var s in protos.ToArray())
+            //{
+            //    System.Diagnostics.Debug.WriteLine(String.Format("this.JS.SetGlobalValue(\"{0}\",new {1}(this.JS));", s.Name.Substring(2), s.Name));
+            //}
             // set up default events
             StringBuilder events = new StringBuilder();
             events.AppendLine("function onScribbleCheck(userobj, isPM) { return true }");

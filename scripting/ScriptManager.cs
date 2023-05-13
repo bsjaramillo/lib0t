@@ -36,15 +36,12 @@ namespace scripting
             Callbacks = new ConcurrentQueue<ICallback>();
             Scripts = new List<JSScript>();
             Scripts.Add(new JSScript("room"));
-
             try
             {
                 String path = Path.Combine(Server.DataPath, "autorun.dat");
-
                 if (File.Exists(path))
                 {
                     String[] lines = File.ReadAllLines(path);
-
                     foreach (String str in lines)
                         Load(str, false);
                 }
@@ -173,6 +170,7 @@ namespace scripting
                     }
                     catch (Jurassic.JavaScriptException e)
                     {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
                         ErrorDispatcher.SendError(script.ScriptName, e.Message, e.LineNumber);
                     }
                     catch { }

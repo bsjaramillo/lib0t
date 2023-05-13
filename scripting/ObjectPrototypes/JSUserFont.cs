@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using Jurassic;
 using Jurassic.Library;
 
@@ -30,7 +31,7 @@ namespace scripting.ObjectPrototypes
         public JSUserFont(ScriptEngine eng)
             : base(eng.Function.InstancePrototype, "UserFont", new Objects.JSUserFont(eng))
         {
-
+            
         }
 
         [JSCallFunction(Flags = JSFunctionFlags.ConvertNullReturnValueToUndefined)]
