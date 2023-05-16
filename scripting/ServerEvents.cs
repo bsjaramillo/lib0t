@@ -644,6 +644,7 @@ namespace scripting
                         }
                         catch (Jurassic.JavaScriptException e)
                         {
+                            System.Diagnostics.Debug.WriteLine(e.Message+"uwu");
                             ErrorDispatcher.SendError(s.ScriptName, e.Message, e.LineNumber);
                         }
                         catch { }
@@ -1182,18 +1183,15 @@ namespace scripting
                     if (u != null)
                         try
                         {
-                            System.Diagnostics.Debug.WriteLine(cmd+u.Name+args);
                             s.JS.CallGlobalFunction("onCommand", u, cmd, t, args);
-                            System.Diagnostics.Debug.WriteLine(cmd);
                         }
                         catch (Jurassic.JavaScriptException e)
                         {
                             System.Diagnostics.Debug.WriteLine(e.Message);
-
                             ErrorDispatcher.SendError(s.ScriptName, e.Message, e.LineNumber);
                         }
                         catch(Exception e) {
-                            System.Diagnostics.Debug.WriteLine(e.Message);
+                            System.Diagnostics.Debug.WriteLine(e);
 
                         }
                 }

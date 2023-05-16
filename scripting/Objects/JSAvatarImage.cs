@@ -19,11 +19,9 @@
 ﻿using System;
 using System.Linq;
 using System.IO;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using Jurassic;
 using Jurassic.Library;
+using ImageMagick;
 
 namespace scripting.Objects
 {
@@ -105,7 +103,7 @@ namespace scripting.Objects
                 if (filename.Length > 1)
                     if (bad_chars.Count<String>(x => filename.Contains(x)) == 0)
                     {
-                        String path = Path.Combine(Server.DataPath, this.Engine.String.Name, "data");
+                        String path = Path.Combine(Server.DataPath, this.Engine.GetGlobalValue("UserData").ToString(), "data");
 
                         try
                         {
@@ -128,16 +126,12 @@ namespace scripting.Objects
         {
             try
             {
-                using (Bitmap avatar_raw = new Bitmap(new MemoryStream(data)))
-                using (Bitmap avatar_sized = new Bitmap(48, 48))
-                using (Graphics g = Graphics.FromImage(avatar_sized))
+                using (var avatar_raw=new MagickImage(data))
                 {
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.DrawImage(avatar_raw, new RectangleF(0, 0, 48, 48));
-
+                    avatar_raw.Resize(48,48);
                     using (MemoryStream ms = new MemoryStream())
                     {
-                        avatar_sized.Save(ms, ImageFormat.Jpeg);
+                        avatar_raw.Write(ms);
                         this.Data = ms.ToArray();
                     }
                 }

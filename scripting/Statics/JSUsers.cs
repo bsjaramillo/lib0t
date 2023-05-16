@@ -39,7 +39,7 @@ namespace scripting.Statics
         {
             if (f is UserDefinedFunction)
             {
-                JSScript script = ScriptManager.Scripts.Find(x => x.ScriptName == eng.String.Name);
+                JSScript script = ScriptManager.Scripts.Find(x => x.ScriptName == eng.GetGlobalValue("UserData").ToString());
 
                 if (script != null)
                 {
@@ -49,7 +49,9 @@ namespace scripting.Statics
                     {
                         script.local_users.ForEach(u => function.Call(eng.Global, u));
                     }
-                    catch { }
+                    catch (Exception e) {
+                        System.Diagnostics.Debug.WriteLine(e);
+                    }
                 }
             }
         }
@@ -59,7 +61,7 @@ namespace scripting.Statics
         {
             if (f is UserDefinedFunction)
             {
-                JSScript script = ScriptManager.Scripts.Find(x => x.ScriptName == eng.String.Name);
+                JSScript script = ScriptManager.Scripts.Find(x => x.ScriptName == eng.GetGlobalValue("UserData").ToString());
 
                 if (script != null)
                     if (Server.Link.IsLinked)
@@ -85,7 +87,7 @@ namespace scripting.Statics
                 try
                 {
                     Server.Users.Banned(x => function.Call(eng.Global,
-                        new Objects.JSBannedUser(eng.Object.InstancePrototype, x, eng.String.Name)));
+                        new Objects.JSBannedUser(eng.Object.InstancePrototype, x, eng.GetGlobalValue("UserData").ToString())));
                 }
                 catch { }
             }
@@ -101,7 +103,7 @@ namespace scripting.Statics
                 try
                 {
                     Server.Users.Records(x => function.Call(eng.Global,
-                        new Objects.JSRecord(eng.Object.InstancePrototype, x, eng.String.Name)));
+                        new Objects.JSRecord(eng.Object.InstancePrototype, x, eng.GetGlobalValue("UserData").ToString())));
                 }
                 catch { }
             }

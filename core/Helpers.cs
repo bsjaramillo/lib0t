@@ -21,12 +21,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Net;
 using System.Security.Cryptography;
-using System.Drawing;
 using System.Globalization;
 using core.ib0t;
 using iconnect;
-using Color = SixLabors.ImageSharp.Color;
-
+using ImageMagick;
+using Color = ImageMagick.MagickColors;
 namespace core
 {
     class Helpers
@@ -55,7 +54,7 @@ namespace core
             }
         }
 
-        private static Color[] acols = new Color[]
+        private static MagickColor[] acols = new MagickColor[]
         {
             Color.White, Color.Black, Color.Navy, Color.Green, Color.Red, Color.Maroon, Color.Purple, Color.Orange,
             Color.Yellow, Color.Lime, Color.Teal, Color.Aqua, Color.Blue, Color.Fuchsia, Color.Gray, Color.Silver
@@ -72,9 +71,9 @@ namespace core
 
             for (int i = 0; i < acols.Length; i++)
             {
-                double d = Math.Sqrt(Math.Pow((r - byte.Parse(acols[i].ToHex().Substring(0, 2))), 2) +
-                                     Math.Pow((g - byte.Parse(acols[i].ToHex().Substring(2, 2))), 2) +
-                                     Math.Pow((b - byte.Parse(acols[i].ToHex().Substring(4, 2))), 2));
+                double d = Math.Sqrt(Math.Pow((r - acols[i].R), 2) +
+                                     Math.Pow((g - acols[i].G), 2) +
+                                     Math.Pow((b - acols[i].B), 2));
 
                 if (d < closest)
                 {

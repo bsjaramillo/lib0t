@@ -1,10 +1,7 @@
 ﻿using core;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using ImageMagick;
 using lib0t;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,46 +16,14 @@ namespace cli
     internal class lib0t_cli
     {
         private ServerCore server { get; set; }
-        private byte[] FileToSizedImageSource(String file, int width, int height)
-        {
-            byte[] data = File.ReadAllBytes(file);
-            return this.FileToSizedImageSource(data, width, height);
-        }
-        private byte[] Compress(byte[] data)
+        
+        private byte[] FileToSizedImageSource(string path, int x, int y)
         {
             byte[] result = null;
-
-            using (MemoryStream ms = new MemoryStream())
-            using (Stream s = new DeflaterOutputStream(ms))
+            using (var raw = new MagickImage(path))
             {
-                s.Write(data, 0, data.Length);
-                s.Close();
-                result = ms.ToArray();
-            }
-
-            return result;
-        }
-        private byte[] FileToSizedImageSource(byte[] data, int x, int y)
-        {
-            byte[] result = null;
-            using (MemoryStream memoryStream = new MemoryStream(data))
-            {
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                memoryStream.Position = 0;
-                var raw = Image.Load(memoryStream);
-                var clone = raw.Clone(context => context
-                            .Resize(new ResizeOptions
-                            {
-                                Mode = ResizeMode.Max,
-                                Size = new Size(x, y)
-                            }));
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    ms.Position = 0;
-                    clone.Save(ms, new PngEncoder { CompressionLevel = PngCompressionLevel.DefaultCompression });
-                    byte[] img_buffer = ms.ToArray();
-                    result = Compress(img_buffer);
-                }
+                raw.Resize(x, y);
+                result =raw.ToByteArray();
             }
             return result;
         }
@@ -167,13 +132,13 @@ namespace cli
             Reginux.SaveAppSettings();
             try
             {
-                String path = Reginux.Sb0tunixPath+"/Avatars/server.png";
+                String path = Reginux.Sb0tunixPath+"/Avatars/"+Reginux.appSettings.AvatarsSettings.serverAvatar;
 
                 if (File.Exists(path))
                 {
-                    byte[] data = this.FileToSizedImageSource(path, 90, 90);
+                    byte[] data = this.FileToSizedImageSource(path, 48, 48);
                     if(data!=null)
-                    Avatars.UpdateServerAvatar(data);
+                        Avatars.UpdateServerAvatar(data);
                 }
             }
 
@@ -182,11 +147,12 @@ namespace cli
             }
             try
             {
-                String path = Reginux.Sb0tunixPath + "/Avatars/default.png";
+                String path = Reginux.Sb0tunixPath + "/Avatars/" + Reginux.appSettings.AvatarsSettings.defaultAvatar;
                 if (File.Exists(path))
                 {
-                    byte[] data = this.FileToSizedImageSource(path, 90, 90);
-                    Avatars.UpdateDefaultAvatar(data);
+                    byte[] data = this.FileToSizedImageSource(path, 48, 48);
+                    if (data != null)
+                        Avatars.UpdateDefaultAvatar(data);
                 }
             }
             catch (Exception e)

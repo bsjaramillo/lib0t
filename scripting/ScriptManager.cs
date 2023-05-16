@@ -170,10 +170,12 @@ namespace scripting
                     }
                     catch (Jurassic.JavaScriptException e)
                     {
-                        System.Diagnostics.Debug.WriteLine(e.Message);
+                        
                         ErrorDispatcher.SendError(script.ScriptName, e.Message, e.LineNumber);
                     }
-                    catch { }
+                    catch(Exception e) {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+                    }
 
                     if (update_autorun)
                         UpdateAutorun();

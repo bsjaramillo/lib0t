@@ -31,7 +31,7 @@ namespace scripting.Instances
             : base(prototype)
         {
             this.PopulateFunctions();
-            this.ScriptName = this.Engine.String.Name;
+            this.ScriptName = this.Engine.GetGlobalValue("UserData").ToString();
             this.StartTime = 0;
 
             JSScript script = ScriptManager.Scripts.Find(x => x.ScriptName == this.ScriptName);

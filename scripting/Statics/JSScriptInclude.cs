@@ -47,7 +47,7 @@ namespace scripting.Statics
                     if (bad_chars.Count<String>(x => filename.Contains(x)) == 0)
                         try
                         {
-                            String path = Path.Combine(Server.DataPath, eng.String.Name, filename);
+                            String path = Path.Combine(Server.DataPath, eng.GetGlobalValue("UserData").ToString(), filename);
                             eng.ExecuteFile(path);
                         }
                         catch (Jurassic.JavaScriptException e)

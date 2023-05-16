@@ -20,14 +20,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Net;
 using System.Threading;
 using Jurassic;
 using Jurassic.Library;
+using ImageMagick;
+using System.IO;
 
 namespace scripting.Instances
 {
@@ -67,7 +65,7 @@ namespace scripting.Instances
                 {
                     Callback = this.Callback,
                     Data = null,
-                    ScriptName = this.Engine.String.Name,
+                    ScriptName = this.Engine.GetGlobalValue("UserData").ToString(),
                     Arg = arg,
                     URL = this.Source
                 };
@@ -86,8 +84,7 @@ namespace scripting.Instances
                             while ((received = stream.Read(buf, 0, 1024)) > 0)
                                 bytes_in.AddRange(buf.Take(received));
                     }
-
-                    using (Bitmap avatar_raw = new Bitmap(new MemoryStream(bytes_in.ToArray())))
+                    using(var avatar_raw = new MagickImage(bytes_in.ToArray()))
                     {
                         int img_x = avatar_raw.Width;
                         int img_y = avatar_raw.Height;
@@ -103,31 +100,21 @@ namespace scripting.Instances
                             img_x -= (int)Math.Floor(Math.Floor((double)img_x / 100) * Math.Floor(((double)(img_y - 384) / img_y) * 100));
                             img_y = 384;
                         }
-
-                        using (Bitmap avatar_sized = new Bitmap(img_x, img_y))
+                        avatar_raw.Resize(img_x, img_y);
+                        using (MemoryStream ms = new MemoryStream())
                         {
-                            using (Graphics g = Graphics.FromImage(avatar_sized))
-                            {
-                                using (SolidBrush sb = new SolidBrush(Color.White))
-                                    g.FillRectangle(sb, new Rectangle(0, 0, img_x, img_y));
-
-                                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                                g.DrawImage(avatar_raw, new RectangleF(0, 0, img_x, img_y));
-
-                                using (MemoryStream ms = new MemoryStream())
-                                {
-                                    avatar_sized.Save(ms, ImageFormat.Jpeg);
-                                    result.Height = avatar_sized.Height;
-                                    byte[] img_buffer = ms.ToArray();
-                                    result.Data = Server.Compression.Compress(img_buffer);
-                                    bytes_in.Clear();
-                                }
-                            }
+                            avatar_raw.Write(ms);
+                            result.Height = avatar_raw.Height;
+                            byte[] img_buffer = ms.ToArray();
+                            result.Data = Server.Compression.Compress(img_buffer);
+                            bytes_in.Clear();
                         }
+                   
                     }
                 }
-                catch { }
-
+                catch (Exception e) {
+                    System.Diagnostics.Debug.WriteLine(e);
+                }
                 ScriptManager.Callbacks.Enqueue(result);
                 this.busy = false;
             }));
@@ -156,7 +143,7 @@ namespace scripting.Instances
                 if (filename.Length > 1)
                     if (bad_chars.Count<String>(x => filename.Contains(x)) == 0)
                     {
-                        String path = Path.Combine(Server.DataPath, this.Engine.String.Name, "data", filename);
+                        String path = Path.Combine(Server.DataPath, this.Engine.GetGlobalValue("UserData").ToString(), "data", filename);
 
                         try
                         {
@@ -166,7 +153,7 @@ namespace scripting.Instances
 
                                 try
                                 {
-                                    using (Bitmap avatar_raw = new Bitmap(new MemoryStream(data)))
+                                    using (var avatar_raw = new MagickImage(data))
                                     {
                                         int img_x = avatar_raw.Width;
                                         int img_y = avatar_raw.Height;
@@ -182,23 +169,16 @@ namespace scripting.Instances
                                             img_x -= (int)Math.Floor(Math.Floor((double)img_x / 100) * Math.Floor(((double)(img_y - 384) / img_y) * 100));
                                             img_y = 384;
                                         }
-
-                                        using (Bitmap avatar_sized = new Bitmap(img_x, img_y))
+                                        avatar_raw.Resize(img_x, img_y);
+                                        using (MemoryStream ms = new MemoryStream())
                                         {
-                                            using (Graphics g = Graphics.FromImage(avatar_sized))
-                                            {
-                                                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                                                g.DrawImage(avatar_raw, new RectangleF(0, 0, img_x, img_y));
-
-                                                using (MemoryStream ms = new MemoryStream())
-                                                {
-                                                    avatar_sized.Save(ms, ImageFormat.Jpeg);
-                                                    scr.Height = avatar_sized.Height;
-                                                    byte[] img_buffer = ms.ToArray();
-                                                    scr.Data = Server.Compression.Compress(img_buffer);
-                                                }
-                                            }
+                                            avatar_raw.Write(ms);
+                                            scr.Height = avatar_raw.Height;
+                                            byte[] img_buffer = ms.ToArray();
+                                            scr.Data = Server.Compression.Compress(img_buffer);
+                                            
                                         }
+
                                     }
                                 }
                                 catch { }

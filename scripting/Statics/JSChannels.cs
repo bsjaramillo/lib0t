@@ -76,7 +76,7 @@ namespace scripting.Statics
                     results.Add(new Objects.JSChannel(eng.Object.InstancePrototype, m));
             }
 
-            return new Objects.JSChannelCollection(eng.Object.InstancePrototype, results.ToArray(),eng.String.Name);
+            return new Objects.JSChannelCollection(eng.Object.InstancePrototype, results.ToArray(),eng.GetGlobalValue("UserData").ToString());
         }
     }
 }

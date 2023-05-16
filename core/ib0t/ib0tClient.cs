@@ -26,8 +26,7 @@ using System.Net.Sockets;
 using iconnect;
 using Heijden.DNS;
 using System.IO;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp;
+using ImageMagick;
 
 namespace core.ib0t
 {
@@ -620,17 +619,12 @@ namespace core.ib0t
         {
             byte[] result;
 
-            using (var avatar_raw = Image.Load(new MemoryStream(raw)))
+            using (var avatar_raw = new MagickImage(raw))
             {
-                var clone = avatar_raw.Clone(context => context
-                            .Resize(new ResizeOptions
-                            {
-                                Mode = ResizeMode.Max,
-                                Size = new Size(48, 48)
-                            }));
+                avatar_raw.Resize(48,48);
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    clone.Save(ms, new JpegEncoder { Quality = 100 });
+                    avatar_raw.Write(ms);
                     byte[] img_buffer = ms.ToArray();
                     result = img_buffer;
                 }

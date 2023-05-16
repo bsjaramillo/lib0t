@@ -22,12 +22,11 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Net;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Threading;
 using Jurassic;
 using Jurassic.Library;
+using ImageMagick;
+using SharpDX;
 
 namespace scripting.Instances
 {
@@ -66,7 +65,7 @@ namespace scripting.Instances
                 {
                     Callback = this.Callback,
                     Data = null,
-                    ScriptName = this.Engine.String.Name,
+                    ScriptName = this.Engine.GetGlobalValue("UserData").ToString(),
                     Arg = arg
                 };
 
@@ -84,25 +83,17 @@ namespace scripting.Instances
                             while ((received = stream.Read(buf, 0, 1024)) > 0)
                                 bytes_in.AddRange(buf.Take(received));
                     }
-
-                    using (Bitmap avatar_raw = new Bitmap(new MemoryStream(bytes_in.ToArray())))
+                    using(var avatar_raw=new MagickImage(bytes_in.ToArray()))
                     {
-                        using (Bitmap avatar_sized = new Bitmap(48, 48))
+                        avatar_raw.Resize(48, 48);
+                        using (MemoryStream ms = new MemoryStream())
                         {
-                            using (Graphics g = Graphics.FromImage(avatar_sized))
-                            {
-                                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                                g.DrawImage(avatar_raw, new RectangleF(0, 0, 48, 48));
-
-                                using (MemoryStream ms = new MemoryStream())
-                                {
-                                    avatar_sized.Save(ms, ImageFormat.Jpeg);
-                                    result.Data = ms.ToArray();
-                                    bytes_in.Clear();
-                                }
-                            }
+                            avatar_raw.Write(ms);
+                            result.Data = ms.ToArray();
+                            bytes_in.Clear();
                         }
                     }
+                    
                 }
                 catch { }
 
@@ -134,31 +125,23 @@ namespace scripting.Instances
                 if (filename.Length > 1)
                     if (bad_chars.Count<String>(x => filename.Contains(x)) == 0)
                     {
-                        String path = Path.Combine(Server.DataPath, this.Engine.String.Name, "data", filename);
+                        String path = Path.Combine(Server.DataPath, this.Engine.GetGlobalValue("UserData").ToString(), "data", filename);
 
                         try
                         {
                             if (File.Exists(path))
                             {
                                 byte[] data = File.ReadAllBytes(path);
-
-                                using (Bitmap avatar_raw = new Bitmap(new MemoryStream(data)))
+                                using (var avatar_raw = new MagickImage(data))
                                 {
-                                    using (Bitmap avatar_sized = new Bitmap(48, 48))
+                                    avatar_raw.Resize(48, 48);
+                                    using (MemoryStream ms = new MemoryStream())
                                     {
-                                        using (Graphics g = Graphics.FromImage(avatar_sized))
-                                        {
-                                            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                                            g.DrawImage(avatar_raw, new RectangleF(0, 0, 48, 48));
-
-                                            using (MemoryStream ms = new MemoryStream())
-                                            {
-                                                avatar_sized.Save(ms, ImageFormat.Jpeg);
-                                                av.Data = ms.ToArray();
-                                            }
-                                        }
+                                        avatar_raw.Write(ms);
+                                        av.Data = ms.ToArray();
                                     }
                                 }
+                                
                             }
                         }
                         catch { }

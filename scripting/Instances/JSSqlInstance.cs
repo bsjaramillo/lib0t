@@ -167,7 +167,7 @@ namespace scripting.Instances
             if (file.Length > 1)
                 if (bad_chars.Count<String>(x => file.Contains(x)) == 0)
                 {
-                    String path = Path.Combine(Server.DataPath, this.Engine.String.Name, "sql");
+                    String path = Path.Combine(Server.DataPath, this.Engine.GetGlobalValue("UserData").ToString(), "sql");
 
                     try
                     {

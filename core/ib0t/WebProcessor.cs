@@ -27,10 +27,7 @@ using captcha;
 using iconnect;
 using System.IO;
 using System.Windows;
-using System.Drawing.Imaging;
-using System.Drawing.Drawing2D;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Formats.Jpeg;
+using ImageMagick;
 
 namespace core.ib0t
 {
@@ -143,7 +140,7 @@ namespace core.ib0t
         {
             byte[] result = null;
             int x, y;
-            using (var avatar_raw = Image.Load(new MemoryStream(raw)))
+            using (var avatar_raw = new MagickImage(raw))
             {
                 int img_x = avatar_raw.Width;
                 int img_y = avatar_raw.Height;
@@ -160,15 +157,10 @@ namespace core.ib0t
                 }
                 x = img_x;
                 y = img_y;
-                var clone = avatar_raw.Clone(context => context
-                            .Resize(new ResizeOptions
-                            {
-                                Mode = ResizeMode.Max,
-                                Size = new Size(x, y)
-                            }));
+                avatar_raw.Resize(x, y);
                 using (MemoryStream ms = new MemoryStream())
                 {
-                   clone.Save(ms, new JpegEncoder { Quality = 100 });
+                   avatar_raw.Write(ms);
                     byte[] img_buffer = ms.ToArray();
                     result = Zip.Compress(img_buffer);
                 }

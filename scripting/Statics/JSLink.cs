@@ -41,7 +41,7 @@ namespace scripting.Statics
             if (Server.Link.IsLinked)
                 if (f is UserDefinedFunction)
                 {
-                    JSScript script = ScriptManager.Scripts.Find(x => x.ScriptName == eng.String.Name);
+                    JSScript script = ScriptManager.Scripts.Find(x => x.ScriptName == eng.GetGlobalValue("UserData").ToString());
 
                     if (script != null)
                     {
@@ -63,7 +63,7 @@ namespace scripting.Statics
 
             if (Server.Link.IsLinked && !(a is Undefined))
             {
-                JSScript script = ScriptManager.Scripts.Find(x => x.ScriptName == eng.String.Name);
+                JSScript script = ScriptManager.Scripts.Find(x => x.ScriptName == eng.GetGlobalValue("UserData").ToString());
 
                 if (script != null)
                 {

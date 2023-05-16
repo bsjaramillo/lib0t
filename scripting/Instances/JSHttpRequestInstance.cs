@@ -39,7 +39,6 @@ namespace scripting.Instances
         {
             this.PopulateFunctions();
             this.Agent = String.Empty;
-
             DefineProperty(Engine.Symbol.ToString(), new PropertyDescriptor("HttpRequest", PropertyAttributes.Sealed), true);
 
         }
@@ -98,7 +97,7 @@ namespace scripting.Instances
         {
             if (this.busy)
                 return false;
-
+            System.Diagnostics.Debug.WriteLine("uwu"+a.ToString());
             Thread thread = new Thread(new ThreadStart(() =>
             {
                 this.busy = true;
@@ -111,7 +110,7 @@ namespace scripting.Instances
                 Objects.JSHttpRequestResult result = new Objects.JSHttpRequestResult(this.Engine.Object.InstancePrototype)
                 {
                     Callback = this.Callback,
-                    ScriptName = this.Engine.String.Name,
+                    ScriptName = this.Engine.GetGlobalValue("UserData").ToString(),
                     Arg = arg
                 };
 

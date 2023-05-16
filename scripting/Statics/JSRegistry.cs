@@ -40,7 +40,7 @@ namespace scripting.Statics
         [JSFunction(Name = "exists", Flags = JSFunctionFlags.HasEngineParameter, IsWritable = false, IsEnumerable = true)]
         public static bool Exists(ScriptEngine eng, String key)
         {
-            String script = eng.String.Name;
+            String script = eng.GetGlobalValue("UserData").ToString();
             String str = Reginux.GetScript(key);
 
             if (str == null)
@@ -52,7 +52,7 @@ namespace scripting.Statics
         [JSFunction(Name = "getValue", Flags = JSFunctionFlags.HasEngineParameter, IsWritable = false, IsEnumerable = true)]
         public static String GetValue(ScriptEngine eng, String key)
         {
-            String script = eng.String.Name;
+            String script = eng.GetGlobalValue("UserData").ToString();
 
 
             String str = Reginux.GetScript(key);
@@ -68,13 +68,13 @@ namespace scripting.Statics
         {
             List<String> results = Reginux.GetScripts();
 
-            return new Objects.JSRegistryKeyCollection(eng.Object.InstancePrototype, results.ToArray(), eng.String.Name);
+            return new Objects.JSRegistryKeyCollection(eng.Object.InstancePrototype, results.ToArray(), eng.GetGlobalValue("UserData").ToString());
         }
 
         [JSFunction(Name = "setValue", Flags = JSFunctionFlags.HasEngineParameter, IsWritable = false, IsEnumerable = true)]
         public static bool SetValue(ScriptEngine eng, String key, object value)
         {
-            String script = eng.String.Name;
+            String script = eng.GetGlobalValue("UserData").ToString();
 
             if (value is int || value is String || value is double || value is ConcatenatedString)
             {
@@ -88,7 +88,7 @@ namespace scripting.Statics
         [JSFunction(Name = "deleteValue", Flags = JSFunctionFlags.HasEngineParameter, IsWritable = false, IsEnumerable = true)]
         public static bool DeleteValue(ScriptEngine eng, String key)
         {
-            String script = eng.String.Name;
+            String script = eng.GetGlobalValue("UserData").ToString();
             try
             {
                 Reginux.DeleteScript(key);
@@ -104,7 +104,7 @@ namespace scripting.Statics
         [JSFunction(Name = "clear", Flags = JSFunctionFlags.HasEngineParameter, IsWritable = false, IsEnumerable = true)]
         public static bool Clear(ScriptEngine eng)
         {
-            String script = eng.String.Name;
+            String script = eng.GetGlobalValue("UserData").ToString();
 
             try
             {

@@ -27,6 +27,7 @@ using iconnect;
 using scripting.ObjectPrototypes;
 using scripting.Statics;
 using scripting.Instances;
+using Windows.UI.Xaml;
 
 namespace scripting
 {
@@ -83,39 +84,35 @@ namespace scripting
             this.JS.SetGlobalValue("User", new JSUser(this.JS));
             this.JS.SetGlobalValue("UserFont", new JSUserFont(this.JS));
         }
+        
+        private void SetJSGlobalFunctions()
+        {
+            JSGlobal.SetEng(this.JS);
+            this.JS.SetGlobalFunction("tickCount", JSGlobal.TickCount);
+            this.JS.SetGlobalFunction("escapeUtf", JSGlobal.EscapeUTF);
+            this.JS.SetGlobalFunction("scriptName",JSGlobal.ScriptName);
+            this.JS.SetGlobalFunction("include", JSGlobal.Include);
+            this.JS.SetGlobalFunction("includeAll", JSGlobal.IncludeAll);
+            this.JS.SetGlobalFunction("byteLength", JSGlobal.ByteLength);
+            this.JS.SetGlobalFunction("print", JSGlobal.Print);
+            this.JS.SetGlobalFunction("clrName", JSGlobal.ClrName);
+            this.JS.SetGlobalFunction("user", JSGlobal.User);
+            this.JS.SetGlobalFunction("sendPM", JSGlobal.SendPM);
+            this.JS.SetGlobalFunction("sendText", JSGlobal.SendText);
+            this.JS.SetGlobalFunction("sendEmote", JSGlobal.SendEmote);
+            this.JS.SetGlobalFunction("stripColors", JSGlobal.StripColors);
+        }
+
         public JSScript(String name)
         {
             this.ScriptName = name;
             this.JS = new ScriptEngine();
+            this.JS.SetGlobalValue("UserData",name);
             //this.JS.UserData = name;
             //this.JS.EnableDebugging = true;
             Type[] types = Assembly.GetExecutingAssembly().GetTypes();
+            this.SetJSGlobalFunctions();
             this.SetJSGlobalValues();
-            // set up global functions
-            //this.JS.Embed.EmbedGlobalClass(typeof(JSGlobal));
-
-            //set up static classes
-            //var statics = types.Where(x => x.Namespace == "scripting.Statics" && x.IsSubclassOf(typeof(ObjectInstance)));
-            //foreach (var s in statics.ToArray())
-            //{
-            //    System.Diagnostics.Debug.WriteLine(String.Format("this.JS.SetGlobalValue(\"{0}\",new {1}(this.JS));", s.Name.Substring(2), s.Name));
-            //}
-            ////this.JS.EmbedStatics(statics.ToArray());
-            ////this.JS.SetGlobalValue("UserFont", new JSUserFont(this.JS));
-            ////set up instance classes
-            //var instances = types.Where(x => x.Namespace == "scripting.Instances" && x.IsSubclassOf(typeof(ClrFunction)));
-            ////this.JS.EmbedInstances(instances.ToArray());
-            //foreach (var s in instances.ToArray())
-            //{
-            //    System.Diagnostics.Debug.WriteLine(String.Format("this.JS.SetGlobalValue(\"{0}\",new {1}(this.JS));", s.Name.Substring(2), s.Name));
-            //}
-            ////set up object prototypes
-            //var protos = types.Where(x => x.Namespace == "scripting.ObjectPrototypes" && x.IsSubclassOf(typeof(ClrFunction)));
-            ////this.JS.EmbedObjectPrototypes(protos.ToArray());
-            //foreach (var s in protos.ToArray())
-            //{
-            //    System.Diagnostics.Debug.WriteLine(String.Format("this.JS.SetGlobalValue(\"{0}\",new {1}(this.JS));", s.Name.Substring(2), s.Name));
-            //}
             // set up default events
             StringBuilder events = new StringBuilder();
             events.AppendLine("function onScribbleCheck(userobj, isPM) { return true }");

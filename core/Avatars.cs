@@ -21,8 +21,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
+using System.Windows.Markup;
+using ImageMagick;
 
 namespace core
 {
@@ -33,7 +33,7 @@ namespace core
 
         public static void UpdateServerAvatar(byte[] data)
         {
-            server_avatar = Scale(data);
+            server_avatar = data;
 
             if (UserPool.AUsers != null)
                 UserPool.AUsers.ForEachWhere(x => x.SendPacket(TCPOutbound.BotAvatar(x, server_avatar)),
@@ -42,7 +42,7 @@ namespace core
 
         public static void UpdateDefaultAvatar(byte[] data)
         {
-            default_avatar = Scale(data);
+            default_avatar = data;
 
             if (UserPool.AUsers != null)
                 UserPool.AUsers.ForEachWhere(x => x.Avatar = default_avatar, x => x.DefaultAvatar);
@@ -101,23 +101,16 @@ namespace core
             }
         }
 
-        private static byte[] Scale(byte[] raw)
+        private static byte[] Scale(byte[] data)
         {
-            byte[] result;
-
-            using (var avatar_raw = Image.Load(new MemoryStream(raw)))
+            byte[] result = null;
+            using (var raw = new MagickImage(data))
             {
-                var clone = avatar_raw.Clone(context => context
-                            .Resize(new ResizeOptions
-                            {
-                                Mode = ResizeMode.Max,
-                                Size = new Size(48, 48)
-                            }));
+                raw.Resize(48, 48);
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    clone.Save(ms, new JpegEncoder { Quality = 100 });
-                    byte[] img_buffer = ms.ToArray();
-                    result = img_buffer;
+                    raw.Write(ms);
+                    result = Zip.Compress(ms.ToArray());
                 }
             }
             return result;

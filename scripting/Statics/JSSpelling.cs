@@ -57,7 +57,7 @@ namespace scripting.Statics
                 results.AddRange(Server.Spelling.Suggest(word));
             }
 
-            return new Objects.JSSpellingSuggestionCollection(eng.Object.InstancePrototype, results.ToArray(), eng.String.Name);
+            return new Objects.JSSpellingSuggestionCollection(eng.Object.InstancePrototype, results.ToArray(), eng.GetGlobalValue("UserData").ToString());
         }
 
         [JSFunction(Name = "confirm", IsWritable = false, IsEnumerable = true)]

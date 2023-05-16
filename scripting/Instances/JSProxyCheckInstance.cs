@@ -93,7 +93,7 @@ namespace scripting.Instances
                         jsonResponse)
                     {
                         Callback = jsDelegate,
-                        ScriptName = this.Engine.String.Name,
+                        ScriptName = this.Engine.GetGlobalValue("UserData").ToString(),
                         User = user
                     };
 
