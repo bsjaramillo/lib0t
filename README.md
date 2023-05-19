@@ -1,7 +1,7 @@
 
 # lib0t
 
-Servidor sb0t para distribuciones Linux. Es un servidor experimental, lo que significa que puede estar sujeto a fallos. Sin embargo se han realizado pruebas, las cuales han sido satisfactorias.
+Servidor sb0t para distribuciones Linux. Es un servidor experimental, lo que significa que puede estar sujeto a fallos. Sin embargo se han realizado pruebas, las cuales han sido exitosas.
 
 
 
@@ -10,7 +10,7 @@ Servidor sb0t para distribuciones Linux. Es un servidor experimental, lo que sig
 Para facilitar la instalación de este servidor, en cualquier distribución Linux, se ha creado una imagen en docker, que contiene todos los ejecutables necesarios para la creación y ejecución de una sala de chat.
 
 ### 1. Instalar Docker
-Los siguientes pasos son para realizar la instalación de docker en la distribución de Linux Ubuntu, si posee otra distribución referirse a la documentación de [documentación de Docker](https://docs.docker.com/engine/install/#server).
+Los siguientes pasos son para realizar la instalación de docker en la distribución de Linux Ubuntu, si posee otra distribución referirse a la [documentación de Docker](https://docs.docker.com/engine/install/#server).
 
 #### 1.1 Remover cualquier instalación previa de Docker
 Las versiones anteriores de Docker se llamaban docker, docker.io, o docker-engine, también puede tener instalaciones de containerd o runc. Desinstale cualquiera de estas versiones anteriores antes de intentar instalar una nueva versión con el siguiente comando.
