@@ -241,7 +241,7 @@ namespace lib0t
         private string _addTopic { get; set; }
         private string _remTopic { get; set; }
 
-        public string _greetMsg { get; set; }
+        private string _greetMsg { get; set; }
 
 
     }
