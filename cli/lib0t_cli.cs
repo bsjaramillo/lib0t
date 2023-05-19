@@ -172,10 +172,19 @@ namespace cli
         }
         static void Main(string[] args)
         {
-
-
             try
             {
+                if (args.Length==0)
+                {
+                    Console.WriteLine("Error creando la sala, se necesita el nombre del workspace");
+                    Environment.Exit(0);
+                }
+                Reginux.Sb0tunixPath = args[0];
+                if (!Directory.Exists(Reginux.Sb0tunixPath))
+                {
+                    Console.WriteLine("Error creando la sala, no existe el workspace: "+ Reginux.Sb0tunixPath);
+                    Environment.Exit(0);
+                }
                 if (Reginux.LoadAppSettings() && Reginux.LoadCommandsSettings())
                 {
                     lib0t_cli sb0TunixObj = new lib0t_cli();
@@ -185,7 +194,7 @@ namespace cli
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine(e.Message);
             }
         }
 

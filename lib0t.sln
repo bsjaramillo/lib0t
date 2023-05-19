@@ -17,6 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iconnect", "iconnect\iconne
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "scripting", "scripting\scripting.csproj", "{DF2133DB-256B-4A65-A752-8F568B889EDB}"
 	ProjectSection(ProjectDependencies) = postProject
+		{BFC44A1B-838E-40F2-9251-6C81C565CD48} = {BFC44A1B-838E-40F2-9251-6C81C565CD48}
 		{C4D28D0F-A594-4AC5-A4B6-EB98D43F4B11} = {C4D28D0F-A594-4AC5-A4B6-EB98D43F4B11}
 	EndProjectSection
 EndProject
@@ -34,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cli", "cli\cli.csproj", "{5
 		{6D5AA967-A0BD-4AD2-A90F-88FCAEE5A116} = {6D5AA967-A0BD-4AD2-A90F-88FCAEE5A116}
 		{D0B6F732-8012-4397-809D-2057DFC46170} = {D0B6F732-8012-4397-809D-2057DFC46170}
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jurassic", "Jurassic\Jurassic.csproj", "{BFC44A1B-838E-40F2-9251-6C81C565CD48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +102,14 @@ Global
 		{5F188AAE-E087-4B78-8F39-06B62FBCBE71}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5F188AAE-E087-4B78-8F39-06B62FBCBE71}.Release|x86.ActiveCfg = Release|x86
 		{5F188AAE-E087-4B78-8F39-06B62FBCBE71}.Release|x86.Build.0 = Release|x86
+		{BFC44A1B-838E-40F2-9251-6C81C565CD48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFC44A1B-838E-40F2-9251-6C81C565CD48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFC44A1B-838E-40F2-9251-6C81C565CD48}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BFC44A1B-838E-40F2-9251-6C81C565CD48}.Debug|x86.Build.0 = Debug|Any CPU
+		{BFC44A1B-838E-40F2-9251-6C81C565CD48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFC44A1B-838E-40F2-9251-6C81C565CD48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFC44A1B-838E-40F2-9251-6C81C565CD48}.Release|x86.ActiveCfg = Release|Any CPU
+		{BFC44A1B-838E-40F2-9251-6C81C565CD48}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

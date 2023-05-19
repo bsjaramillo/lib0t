@@ -8,21 +8,26 @@ namespace lib0t
 {
     public static class Reginux
     {
-        private static string sb0tunixPath = Path.GetFullPath("lib0t");
+        private static string sb0tunixPath { get; set; }
+        private static string sb0tunixPathSettings { get; set; }
+        private static string sb0tunixPathScripting { get; set; }
+        private static string filenameScripting { get; set; }
+        private static string filenamePathAppSettings { get; set; }
+        private static string filenamePathCommandsSettings { get; set; }
         public static string Sb0tunixPath
         {
             get { return sb0tunixPath; }
+            set { 
+                sb0tunixPath = Path.GetFullPath("lib0t/"+value);
+                sb0tunixPathSettings = Path.GetFullPath(sb0tunixPath + "/Settings");
+                sb0tunixPathScripting = Path.GetFullPath(sb0tunixPath + "/scripting");
+                filenameScripting = Path.GetFullPath(sb0tunixPathScripting + "/scripting.json");
+                filenamePathAppSettings = Path.GetFullPath(sb0tunixPathSettings + "/AppSettings.json");
+                filenamePathCommandsSettings = Path.GetFullPath(sb0tunixPathSettings + "/CommandsSettings.json");
+            }
         }
 
-        private static string sb0tunixPathSettings = Path.GetFullPath(sb0tunixPath + "/Settings");
-        private static string sb0tunixPathScripting = Path.GetFullPath(sb0tunixPath + "/scripting");
-        private static string filenameScripting = Path.GetFullPath(sb0tunixPathScripting + "/scripting.json");
-        public static string Sb0tunixPathSettings
-        {
-            get { return sb0tunixPathSettings; }
-        }
-        private static string filenamePathAppSettings = Path.GetFullPath(sb0tunixPathSettings + "/AppSettings.json");
-        private static string filenamePathCommandsSettings = Path.GetFullPath(sb0tunixPathSettings + "/CommandsSettings.json");
+
         public static AppSettings appSettings { get; set; }
         public static CommandsSettings commandsSettings { get; set; }
         public static bool LoadAppSettings()

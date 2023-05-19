@@ -87,7 +87,7 @@ namespace scripting
         
         private void SetJSGlobalFunctions()
         {
-            JSGlobal.SetEng(this.JS);
+            JSGlobal.eng=this.JS;
             this.JS.SetGlobalFunction("tickCount", JSGlobal.TickCount);
             this.JS.SetGlobalFunction("escapeUtf", JSGlobal.EscapeUTF);
             this.JS.SetGlobalFunction("scriptName",JSGlobal.ScriptName);
@@ -129,6 +129,7 @@ namespace scripting
             events.AppendLine("function onTimer() { }");
             events.AppendLine("function onHelp(userobj) { }");
             events.AppendLine("function onCommand(userobj, command, target, args) { }");
+            events.AppendLine("function onCommand(userobj, command, args) { }");
             events.AppendLine("function onAvatar(userobj) { return true; }");
             events.AppendLine("function onPersonalMessage(userobj, msg) { return true; }");
             events.AppendLine("function onRejected(userobj) { }");

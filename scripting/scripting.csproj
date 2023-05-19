@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jurassic" Version="3.2.6" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SharpDX.Direct2D1" Version="4.2.0" />
@@ -30,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\iconnect\iconnect.csproj" />
+    <ProjectReference Include="..\Jurassic\Jurassic.csproj" />
     <ProjectReference Include="..\lib0t\lib0t.csproj" />
   </ItemGroup>
 

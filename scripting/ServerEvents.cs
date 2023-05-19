@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using iconnect;
+using Jurassic.Library;
 
 namespace scripting
 {
@@ -644,10 +645,12 @@ namespace scripting
                         }
                         catch (Jurassic.JavaScriptException e)
                         {
-                            System.Diagnostics.Debug.WriteLine(e.Message+"uwu");
+                            System.Diagnostics.Debug.WriteLine(e.Message);
                             ErrorDispatcher.SendError(s.ScriptName, e.Message, e.LineNumber);
                         }
-                        catch { }
+                        catch(Exception e) {
+                            System.Diagnostics.Debug.WriteLine(e.Message + "uwu");
+                        }
                 }
             }
         }
@@ -1127,7 +1130,7 @@ namespace scripting
                 {
                     if (cmd == "livescripts")
                     {
-                        LiveScript.ListScripts(client);
+                        LiveScript.LiveScripts(client);
                         return;
                     }
 
@@ -1179,15 +1182,16 @@ namespace scripting
                 {
                     Objects.JSUser u = s.GetUser(client);
                     Objects.JSUser t = s.GetUser(target);
-
                     if (u != null)
                         try
                         {
-                            s.JS.CallGlobalFunction("onCommand", u, cmd, t, args);
+                            if (t == null)
+                                s.JS.CallGlobalFunction("onCommand", u, cmd, args);
+                            else
+                                s.JS.CallGlobalFunction("onCommand", u, cmd, t, args);
                         }
                         catch (Jurassic.JavaScriptException e)
                         {
-                            System.Diagnostics.Debug.WriteLine(e.Message);
                             ErrorDispatcher.SendError(s.ScriptName, e.Message, e.LineNumber);
                         }
                         catch(Exception e) {

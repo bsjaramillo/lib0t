@@ -37,12 +37,8 @@ namespace scripting
             "\\",
             " ",
         };
-        private static ScriptEngine eng;
+        public static ScriptEngine eng;
 
-        public static void SetEng(ScriptEngine eng)
-        {
-            eng = eng;
-        }
 
         [JSFunction(Name = "tickCount")]
         public static double TickCount()
