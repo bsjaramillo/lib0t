@@ -1,7 +1,7 @@
 
 # lib0t
 
-Servidor sb0t para sistemas operativos Linux. Es un servidor experimental, lo que significa que puede estar sujeto a fallos. Sin embargo se han realizado pruebas, las cuales han sido satisfactorias.
+Servidor sb0t para distribuciones Linux. Es un servidor experimental, lo que significa que puede estar sujeto a fallos. Sin embargo se han realizado pruebas, las cuales han sido satisfactorias.
 
 
 
