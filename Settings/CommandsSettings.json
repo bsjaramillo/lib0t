@@ -1,6 +1,6 @@
 {
   "adminAnnounce": false,
-  "colors": true,
+  "colors": false,
   "stealth": false,
   "url": false,
   "muzzleTimeout": 0,
@@ -10,8 +10,8 @@
   "filtering": false,
   "capsMonitoring": false,
   "idleMonitoring": false,
-  "general": true,
-  "scribbles": true,
+  "general": false,
+  "scribbles": false,
   "audios": false,
   "buzzes": false,
   "greetMsg": false,
