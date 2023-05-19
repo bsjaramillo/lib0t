@@ -78,17 +78,15 @@ sudo mkdir ~/lib0t/room1/Settings
 ### 2.1 Descargar los archivos de configuración
 AppSettings.json, este archivo de configuración es necesario para la creación de la sala de chat, en este se establecen los valores o parámetros para el nombre de la sala, puerto, contraseña, habilitar para ib0t, etc.
 
-*sudo wget -O ~/lib0t/**workspace**/Settings/AppSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/AppSettings.json?token=GHSAT0AAAAAACBN2LHP5PUKOGGWYZS7EY5CZDG6NNA*
+*sudo wget -O ~/lib0t/**workspace**/Settings/AppSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/AppSettings.json*
 ```bash
-sudo wget -O ~/lib0t/room1/Settings/AppSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/AppSettings.json?token=GHSAT0AAAAAACBN2LHP5PUKOGGWYZS7EY5CZDG6NNA
-
-
+sudo wget -O ~/lib0t/room1/Settings/AppSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/AppSettings.json
 ```
 CommandsSettings, este archivo de configuración es necesario en tiempo de ejecución de la sala, no es necesario editar.
 
-*sudo wget -O ~/lib0t/**workspace**/Settings/CommandsSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/CommandsSettings.json?token=GHSAT0AAAAAACBN2LHOUJ6URUXKMYWENF3KZDG6EFA*
+*sudo wget -O ~/lib0t/**workspace**/Settings/CommandsSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/CommandsSettings.json*
 ```bash
-sudo wget -O ~/lib0t/room1/Settings/CommandsSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/CommandsSettings.json?token=GHSAT0AAAAAACBN2LHOUJ6URUXKMYWENF3KZDG6EFA
+sudo wget -O ~/lib0t/room1/Settings/CommandsSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/CommandsSettings.json
 
 ```
 ## 3.0 Configurar la sala de chat
@@ -129,9 +127,9 @@ Para moverse dentro del archivo utilizar las flechas de dirección del teclado. 
 ## 4.0 Crear la sala de chat
 En este punto recordar el nombre del **workspace** elegido en el punto 1.0 y el **puerto** establecido en el archivo de configuración AppSettings.json. Ejecutar el siguiente comando.
 
-*sudo docker run -d -it -v ~/lib0t/**workspace**:/lib0t/**workspace** --name **workspace** -p **puerto**:**puerto** lib0t **workspace***
+*sudo docker run -d -it -v ~/lib0t/**workspace**:/lib0t/**workspace** --name **workspace** -p **puerto**:**puerto** bsjaramillo/lib0t **workspace***
 ```bash
-sudo docker run -d -it -v ~/lib0t/room1:/lib0t/room1 --name room1 -p 54321:54321 lib0t room1
+sudo docker run -d -it -v ~/lib0t/room1:/lib0t/room1 --name room1 -p 54321:54321 bsjaramillo/lib0t room1
 ```
 Para verificar que la sala ha sido creada con sin problemas, ejectuar el siguiente comando.
 
