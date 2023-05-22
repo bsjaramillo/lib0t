@@ -31,7 +31,7 @@ namespace core
 {
     public class Settings
     {
-        public const String RELEASE_URL = "https://github.com/bsjaramillo/lib0t/releases";
+        public const String RELEASE_URL = "https://hub.docker.com/r/bsjaramillo/lib0t";
         public const String VERSION_CHECK_URL = "https://api.github.com/repos/bsjaramillo/lib0t/releases";
         public const String VERSION_NUMBER = "6.0";
 
@@ -132,7 +132,7 @@ namespace core
             get
             {
                 if (language == 0)
-                    language = Get<byte>("preferredLanguage", "AdvancedSettings");
+                    language = Convert.ToByte(Get<int>("preferredLanguage", "AdvancedSettings"));
 
                 return language;
             }

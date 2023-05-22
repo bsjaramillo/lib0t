@@ -490,13 +490,21 @@ namespace core
                             version = version.ToLower().Replace("v", "").Trim();
 
 
-                            if (new Version(Settings.VERSION).CompareTo(new Version(version)) >= 0)
+                            try
+                            {
+                                if (new Version(Settings.VERSION_NUMBER).CompareTo(new Version(version)) >= 0)
+                                {
+                                    return;
+                                }
+                            }
+                            catch
                             {
                                 return;
                             }
+                            
 
                             String message =
-                                "A new version(v" + version + ") of sb0t is available, download it at " +
+                                "A new version(v" + version + ") of lib0t is available, download it at " +
                                 Settings.RELEASE_URL;
 
                             // ares users
