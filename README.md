@@ -6,7 +6,7 @@ Servidor sb0t para distribuciones Linux. Es un servidor experimental, lo que sig
 
 
 
-## Instalación
+## Instalación manual
 Para facilitar la instalación de este servidor, en cualquier distribución Linux, se ha creado una imagen en docker, que contiene todos los ejecutables necesarios para la creación y ejecución de una sala de chat.
 
 ### 1. Instalar Docker
@@ -53,7 +53,7 @@ Verifica que la imagen se haya descargado
 ```bash
 sudo docker images
 ```
-# Crear una sala de chat
+## Crear una sala de chat
 Con este servidor se da la posibilidad de poder crear multiples salas de chat en una misma máquina. Por lo cual es necesario crear un **workspace** o carpeta, que separe los archivos de configuración (templates, motd, scripts, etc) de cada sala de chat.
 ## 1.0 Crear el workspace para la sala de chat
 Primero crear la siguiente carpeta
