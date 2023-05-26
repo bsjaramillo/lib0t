@@ -139,21 +139,7 @@ sudo docker logs room1
 ```
 Al ejecutar este comando debería visualizar un mensaje diciendo que se ha creado la sala en el puerto establecido.
 
-## 5.0 Crear las reglas en el Firewall
-Al igual que en Windows es necesario crear reglas en el Firewall para permitir conexiones al servidor.
-
-Para esto ejecutar los commandos
-
-*sudo ufw allow **puerto**/tcp*
-
-*sudo ufw allow **puerto**/udp*
-
-```bash
-sudo ufw allow 54321/tcp
-sudo ufw allow 54321/udp
-```
-
-## 6.0 Iniciar, Apagar, Reinciar servidor (lib0t)
+## 5.0 Iniciar, Apagar, Reinciar servidor (lib0t)
 
 Para iniciar el servidor
 
