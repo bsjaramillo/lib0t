@@ -324,7 +324,7 @@ namespace core.LinkLeaf
                 return;
             }
 
-            if (((LinkHub.LinkMode)Settings.Get<int>("allowLinkedAdmin", "LinkingSettings")) != LinkHub.LinkMode.Leaf)
+            if (((LinkHub.LinkMode)Settings.Get<int>("linkMode", "LinkingSettings")) != LinkHub.LinkMode.Leaf)
             {
                 Events.LinkError(LinkError.EnableLeafLinking);
                 return;

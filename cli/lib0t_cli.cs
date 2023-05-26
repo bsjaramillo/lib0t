@@ -1,15 +1,7 @@
 ﻿using core;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using ImageMagick;
 using lib0t;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace cli
 {
@@ -105,6 +97,46 @@ namespace cli
                 Settings.Set("yourLeafIdentifier", "LinkingSettings", "sblnk://" + Convert.ToBase64String(list.ToArray()));
             }
         }
+
+        private void AddLinks()
+        {
+            try{
+                core.LinkHub.TrustedLeavesManager.Init();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            
+            string[] links = Settings.Get<string[]>("trustedLeaves", "LinkingSettings");
+            foreach (string link in links)
+            {
+                try
+                {
+                    if (link.StartsWith("sblnk://"))
+                    {
+                        string text = link.Substring(8);
+                        byte[] buffer = Convert.FromBase64String(text);
+                        Array.Reverse(buffer);
+                        byte len = buffer[0];
+                        String name = Encoding.UTF8.GetString(buffer, 1, len);
+                        Guid guid = new Guid(buffer.Skip(1 + len).ToArray());
+                        core.LinkHub.TrustedLeafItem item = new core.LinkHub.TrustedLeafItem
+                        {
+                            Guid = guid,
+                            Name = name
+                        };
+                        core.LinkHub.TrustedLeavesManager.AddItem(item);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogUpdate(null, new ServerLogEventArgs { Message = ex.Message });
+                }
+
+
+            }
+        }
         private void InitServer()
         {
             this.server = new ServerCore();
@@ -130,8 +162,10 @@ namespace cli
             this.CreateImporter2();
             this.SetLinkIdent();
             Reginux.SaveAppSettings();
+            
             try
             {
+                this.AddLinks();
                 String path = Reginux.Sb0tunixPath+"/Avatars/"+Reginux.appSettings.AvatarsSettings.serverAvatar;
 
                 if (File.Exists(path))
@@ -161,15 +195,15 @@ namespace cli
             }
             if (!this.server.Open())
             {
-                Environment.Exit(0);
+                throw new Exception("No se pudo iniciar o crear la sala de chat");
             }
             else
             {
                 Console.WriteLine("Sala {0} creada con éxito con puerto {1}", Reginux.appSettings.MainSettings.roomName, Reginux.appSettings.MainSettings.roomPort);
-
             }
 
         }
+        
         static void Main(string[] args)
         {
             try
@@ -194,7 +228,8 @@ namespace cli
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.Message);
+                Console.WriteLine("No se pudo inciar la sala de chat, motivo: {0}",e.Message);
+                Environment.Exit(0);
             }
         }
 

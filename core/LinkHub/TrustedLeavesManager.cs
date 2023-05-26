@@ -16,12 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.IO;
-using System.Data;
 using System.Data.SQLite;
 using System.Security.Cryptography;
 using System.Net;
@@ -47,19 +42,16 @@ namespace core.LinkHub
 
             if (!File.Exists(DataPath))
                 CreateDatabase();
-
             using (SQLiteConnection connection = new SQLiteConnection("Data Source=\"" + DataPath + "\""))
             {
                 connection.Open();
 
-                using (SQLiteCommand command = new SQLiteCommand("select * from trusted", connection))
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                    while (reader.Read())
-                        items.Add(new TrustedLeafItem
-                        {
-                            Name = (String)reader["name"],
-                            Guid = new Guid((String)reader["guid"])
-                        });
+                String query = "delete from trusted";
+
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
