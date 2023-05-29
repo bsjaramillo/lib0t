@@ -6,7 +6,7 @@ Servidor sb0t para distribuciones Linux. Es un servidor experimental, lo que sig
 
 - Docker
 
-### 1. Instalar Docker
+### 1 Instalar Docker
 Los siguientes pasos son para realizar la instalación de docker en la distribución de Linux Ubuntu, si posee otra distribución referirse a la [documentación de Docker](https://docs.docker.com/engine/install/#server).
 
 #### 1.1 Remover cualquier instalación previa de Docker
@@ -43,13 +43,74 @@ Este comando descarga una imagen de prueba y la ejecuta en un contenedor. Cuando
 
 
 ## Crear sala de chat con lib0t - Proceso guiado (gráfico)
-Proximamente
+La creación de una sala de chat mediante un proceso guiado, se refiere al uso de una aplicación para facilitar la ejecución de comandos descritos en el proceso manual.
+Esta aplicación es una aplicación web (página), que permite crear salas de chat y administrarlas. Para ello es necesario la instalación de dos aplicaciones, una aplicación cliente (página) y una aplicación servidor.
+Estas aplicaciones han sido empaquetas en imagenes de Docker, para facilitar su instalación, por lo que se requiere de Docker para su instalación.
+
+### 1 Instalar aplicación servidor
+
+Ejecutar el siguiente comando
+
+```
+sudo docker run -it -d --name las -v /var/run/docker.sock:/var/run/docker.sock -v /lib0t:/lib0t -p 7000:80 bsjaramillo/las
+```
+Al ejecutar este comando, se descargará la aplicación servidor y quedará en ejecución lista para usarla.
+
+**Nota:** Se requiere que el puerto de aplicación servidor (7000) esté configurado en el firewall de la vps.
+
+### 2 Instalar aplicación cliente
+
+Ejecutar el siguiente comando
+
+```
+sudo docker run -it -d --name lac -p 9000:80 bsjaramillo/lac
+```
+Al ejecutar este comando, se descargará la aplicación cliente (página) y quedará en ejecución lista para usarla
+Para abrir la aplicación web en cualquier navegador, user la IP del servidor y el puerto que usa la aplicación web.
+Ejemplo:
+```
+http://3.50.100.200:9000
+```
+**Nota:** Se requiere que el puerto de aplicación cliente (9000) esté configurado en el firewall de la vps.
+
+### 3 Crear usuario administrador
+Para poder crear y administar las salas de chat, la aplicación cliente (página) requerirá de un login para poder ejecutar los comandos, por motivos de control y seguridad.
+
+#### 3.1 Crear una base de datos para los usuarios
+Ejecutar el siguiente comando.
+```
+sudo docker exec -it las python3 cli_tool.py -o create_database
+```
+Si se ejecutó correctamente, esto desplegará un mensaje de que la base de datos ha sido inicializada.
+
+#### 3.2 Crear una clave secreta
+Ejecutar el siguiente comando.
+```
+sudo docker exec -it las python3 cli_tool.py -o generate_secret_key
+```
+Si se ejecutó correctamente, esto desplegará un mensaje de que se ha creado una clave secreta.
+
+#### 3.3 Crear usuario administrador
+Ejecutar el siguiente comando.
+```
+sudo docker exec -it las python3 cli_tool.py -o generate_admin_user
+```
+Este comando le pedirá que ingrese un nombre de usuario y una contraseña.
+Si se ejecutó correctamente, esto desplegará un mensaje de que se ha creado un usuario administrador.
+
+#### 3.4 Opcional
+Si olvida la contraseña puede cambiarla con el siguiente comando.
+```
+sudo docker exec -it las python3 cli_tool.py -o regenerate_admin_password
+```
+Este comando le pedirá que ingrese el nombre de usuario y una contraseña nueva.
+Si se ejecutó correctamente, esto desplegará un mensaje de que se ha actualizado la contraseña.
 
 ## Crear sala de chat con lib0t - Proceso manual
 Para facilitar la instalación de este servidor, en cualquier distribución Linux, se ha creado una imagen en docker, que contiene todos los ejecutables necesarios para la creación y ejecución de una sala de chat, por lo cual, se requiere tener instalado Docker.
 
 
-## 1. Descargar e instalar lib0t
+### 1 Descargar e instalar lib0t
 Descargar la imagen de lib0t de los repositorios de Docker
 ```bash
 sudo docker pull bsjaramillo/lib0t
@@ -59,7 +120,7 @@ Verifica que la imagen se haya descargado
 sudo docker images
 ```
 
-## 2. Crear el chatroom space para la sala de chat
+### 2 Crear el chatroom space para la sala de chat
 Con este servidor se da la posibilidad de poder crear multiples salas de chat en una misma máquina. Por lo cual es necesario crear un **chatroom space** o carpeta, que separe los archivos de configuración (templates, motd, scripts, etc) de cada sala de chat.
 
 Primero crear la siguiente carpeta
@@ -73,15 +134,15 @@ Luego elegir el nombre del **chatroom space** para la sala de chat, elegir un no
 ```bash
 sudo mkdir /lib0t/room1
 ```
-## 3. Descargar archivos de configuración para la sala de chat
+### 3 Descargar archivos de configuración para la sala de chat
 Para configurar una sala de chat (nombre, puerto, etc) en Windows se utilizaba la interfaz de usuario, en las distribuciones Linux por lo general no existe o no es posible realizarlo de la misma manera. Por lo cual es necesario descargar y editar unos archivos de configuración en formato JSON.
-### 3.1 Crear la carpeta para los archivos de configuración
+#### 3.1 Crear la carpeta para los archivos de configuración
 
 *sudo mkdir /lib0t/**chatroom space**/Settings*
 ```bash
 sudo mkdir /lib0t/room1/Settings
 ```
-### 3.2 Descargar los archivos de configuración
+#### 3.2 Descargar los archivos de configuración
 AppSettings.json, este archivo de configuración es necesario para la creación de la sala de chat, en este se establecen los valores o parámetros para el nombre de la sala, puerto, contraseña, habilitar para ib0t, etc.
 
 *sudo wget -O /lib0t/**chatroom space**/Settings/AppSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/AppSettings.json*
@@ -95,7 +156,7 @@ CommandsSettings, este archivo de configuración es necesario en tiempo de ejecu
 sudo wget -O /lib0t/room1/Settings/CommandsSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/CommandsSettings.json
 
 ```
-## 4. Configurar la sala de chat
+### 4 Configurar la sala de chat
 Para configurar la sala de chat es necesario editar el archivo AppSettings.json previamente descargado. Este archivo está dividido en varias secciones.
 ```
 Configuraciones Principales (MainSettings)
@@ -130,7 +191,7 @@ sudo nano /lib0t/room1/Settings/AppSettings.json
 ```
 
 Para moverse dentro del archivo utilizar las flechas de dirección del teclado. Una vez terminado de editar el archivo guardar los cambios presionar las teclas "Ctrl+x", luego la tecla "y" y por último dar enter.
-## 5. Crear la sala de chat
+### 5 Crear la sala de chat
 En este punto recordar el nombre del **chatroom space** elegido en el punto 1.0 y el **puerto** establecido en el archivo de configuración AppSettings.json. Ejecutar el siguiente comando.
 
 *sudo docker run -d -it -v /lib0t/**chatroom space**:/lib0t/**chatroom space** --name **chatroom space** -p **puerto**:**puerto** bsjaramillo/lib0t **chatroom space***
@@ -145,7 +206,7 @@ sudo docker logs room1
 ```
 Al ejecutar este comando debería visualizar un mensaje diciendo que se ha creado la sala en el puerto establecido.
 
-## 6. Iniciar, Apagar, Eliminar, Reinciar sala de chat
+### 6 Iniciar, Apagar, Eliminar, Reinciar sala de chat
 
 Para iniciar la sala de chat
 
