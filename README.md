@@ -1,6 +1,8 @@
 # lib0t
 
-Servidor sb0t para distribuciones Linux. Es un servidor experimental, lo que significa que puede estar sujeto a fallos. Sin embargo se han realizado pruebas, las cuales han sido exitosas.
+Servidor sb0t para distribuciones Linux.
+
+Es un servidor experimental, lo que significa que puede estar sujeto a fallos. Sin embargo se han realizado pruebas, las cuales han sido exitosas.
 
 ## Requisitos
 
@@ -65,7 +67,8 @@ Ejecutar el siguiente comando
 ```
 sudo docker run -it -d --name lac -p 9000:80 bsjaramillo/lac
 ```
-Al ejecutar este comando, se descargará la aplicación cliente (página) y quedará en ejecución lista para usarla
+Al ejecutar este comando, se descargará la aplicación cliente (página) y quedará en ejecución lista para usarla.
+
 Para abrir la aplicación web en cualquier navegador, user la IP del servidor y el puerto que usa la aplicación web.
 Ejemplo:
 ```
@@ -96,6 +99,7 @@ Ejecutar el siguiente comando.
 sudo docker exec -it las python3 cli_tool.py -o generate_admin_user
 ```
 Este comando le pedirá que ingrese un nombre de usuario y una contraseña.
+
 Si se ejecutó correctamente, esto desplegará un mensaje de que se ha creado un usuario administrador.
 
 #### 3.4 Opcional
@@ -104,6 +108,7 @@ Si olvida la contraseña puede cambiarla con el siguiente comando.
 sudo docker exec -it las python3 cli_tool.py -o regenerate_admin_password
 ```
 Este comando le pedirá que ingrese el nombre de usuario y una contraseña nueva.
+
 Si se ejecutó correctamente, esto desplegará un mensaje de que se ha actualizado la contraseña.
 
 ## Crear sala de chat con lib0t - Proceso manual
