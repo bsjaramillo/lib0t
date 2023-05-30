@@ -69,7 +69,6 @@ namespace core.Udp
             if (udp.Showing)
             {
                 UdpStats.SENDINFO++;
-
                 udp.SendDatagram(new UdpItem
                 {
                     Data = UdpOutbound.AckInfo(time),
@@ -145,7 +144,6 @@ namespace core.Udp
 
                 if (nodes.Count > 20)
                     nodes = nodes.GetRange(0, 20);
-
                 udp.SendDatagram(new UdpItem
                 {
                     Data = UdpOutbound.AckNodes(nodes.ToArray()),
