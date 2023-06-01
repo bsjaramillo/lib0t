@@ -149,8 +149,7 @@ namespace core
                     return (buf[1] >= 16 && buf[1] <= 31);
             }
 
-            buf = Settings.Get<byte[]>("ip","ExtraSettings");
-
+            buf= IPAddress.Parse(Settings.Get<string>("ip", "ExtraSettings")).GetAddressBytes();
             if (buf != null)
                 return client.ExternalIP.Equals(new IPAddress(buf));
 
