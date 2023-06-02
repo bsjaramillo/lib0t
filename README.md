@@ -2,7 +2,7 @@
 
 Servidor sb0t para distribuciones Linux.
 
-Es un servidor experimental, lo que significa que puede estar sujeto a fallos. Sin embargo se han realizado pruebas, las cuales han sido exitosas.
+Es un servidor experimental, lo que significa que puede estar sujeto a fallos. Sin embargo se han realizado pruebas, las cuales han sido exitosas en la mayoría de funciones del servidor.
 
 **Problemas actuales que presenta el servidor**
 - Usuarios de cb0t/ares o clientes TCP presentan problemas al escribir, los mensajes se cortan.
