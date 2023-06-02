@@ -4,6 +4,10 @@ Servidor sb0t para distribuciones Linux.
 
 Es un servidor experimental, lo que significa que puede estar sujeto a fallos. Sin embargo se han realizado pruebas, las cuales han sido exitosas.
 
+**Problemas actuales que presenta el servidor**
+- Usuarios de cb0t/ares o clientes TCP presentan problemas al escribir, los mensajes se cortan.
+- Algunos usuarios en general presentan problemas para conectarse, el servidor los rechaza.
+
 ## Requisitos
 
 - Docker
@@ -24,20 +28,30 @@ sudo apt-get remove docker docker-engine docker.io containerd runc
 sudo apt-get update
 sudo apt-get install ca-certificates curl gnupg
 ```
-##### 1.2.2 Agregue la clave GPG oficial de Docker
+
+#### 1.2.2 Agregue la clave GPG oficial de Docker
+```bash
+sudo install -m 0755 -d /etc/apt/keyrings
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+```
+
+##### 1.2.3 Agregar Docker a los repositorios de Ubuntu.
 ```bash
 echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
-##### 1.2.3 Actualizar repositorios
+##### 1.2.4 Actualizar repositorios
 
 ```bash
 sudo apt-get update
 ```
-### 1.3 Installar Docker
+### 1.3 Instalar Docker
 ```bash
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
-### 1.3 Verificar la instalación de Docker
+### 1.4 Verificar la instalación de Docker
 ```bash
 sudo docker run hello-world
 ```
@@ -196,6 +210,7 @@ sudo nano /lib0t/room1/Settings/AppSettings.json
 ```
 
 Para moverse dentro del archivo utilizar las flechas de dirección del teclado. Una vez terminado de editar el archivo guardar los cambios presionar las teclas "Ctrl+x", luego la tecla "y" y por último dar enter.
+
 ### 5 Crear la sala de chat
 En este punto recordar el nombre del **chatroom space** elegido en el punto 1.0 y el **puerto** establecido en el archivo de configuración AppSettings.json. Ejecutar el siguiente comando.
 
