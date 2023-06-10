@@ -22,6 +22,7 @@ using System.Linq;
 using System.IO;
 using System.Net;
 using System.Xml.Linq;
+using lib0t;
 
 namespace core.Udp
 {
@@ -37,13 +38,12 @@ namespace core.Udp
 
         public static void Initialize()
         {
-            DataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
-               "\\sb0t\\" + AppDomain.CurrentDomain.FriendlyName;
+            DataPath = Reginux.Sb0tunixPath;
 
             if (!Directory.Exists(DataPath))
                 Directory.CreateDirectory(DataPath);
 
-            DataPath += "\\nodes.xml";
+            DataPath += "/nodes.xml";
 
             if (!LoadList())
                 LoadDefaultList();

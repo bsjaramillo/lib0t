@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+	  <TargetFramework>netcoreapp3.1</TargetFramework>
+	  <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x86</Platforms>
+    <StartupObject>cli.lib0t_cli</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

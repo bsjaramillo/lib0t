@@ -8,22 +8,22 @@ namespace lib0t
 {
     public static class Reginux
     {
-        private static string sb0tunixPath { get; set; }
-        private static string sb0tunixPathSettings { get; set; }
-        private static string sb0tunixPathScripting { get; set; }
+        private static string lib0tPath { get; set; }
+        private static string lib0tPathSettings { get; set; }
+        private static string lib0tPathScripting { get; set; }
         private static string filenameScripting { get; set; }
         private static string filenamePathAppSettings { get; set; }
         private static string filenamePathCommandsSettings { get; set; }
         public static string Sb0tunixPath
         {
-            get { return sb0tunixPath; }
+            get { return lib0tPath; }
             set { 
-                sb0tunixPath = Path.GetFullPath("lib0t/"+value);
-                sb0tunixPathSettings = Path.GetFullPath(sb0tunixPath + "/Settings");
-                sb0tunixPathScripting = Path.GetFullPath(sb0tunixPath + "/scripting");
-                filenameScripting = Path.GetFullPath(sb0tunixPathScripting + "/scripting.json");
-                filenamePathAppSettings = Path.GetFullPath(sb0tunixPathSettings + "/AppSettings.json");
-                filenamePathCommandsSettings = Path.GetFullPath(sb0tunixPathSettings + "/CommandsSettings.json");
+                lib0tPath = Path.GetFullPath("lib0t/"+value);
+                lib0tPathSettings = Path.GetFullPath(lib0tPath + "/Settings");
+                lib0tPathScripting = Path.GetFullPath(lib0tPath + "/scripting");
+                filenameScripting = Path.GetFullPath(lib0tPathScripting + "/scripting.json");
+                filenamePathAppSettings = Path.GetFullPath(lib0tPathSettings + "/AppSettings.json");
+                filenamePathCommandsSettings = Path.GetFullPath(lib0tPathSettings + "/CommandsSettings.json");
             }
         }
 
@@ -49,7 +49,7 @@ namespace lib0t
             List<String> results = new List<String>();
             try
             {
-                if (!Directory.Exists(sb0tunixPathScripting))
+                if (!Directory.Exists(lib0tPathScripting))
                 {
                     return results;
                 }
@@ -69,7 +69,7 @@ namespace lib0t
 
             try
             {
-                if (!Directory.Exists(sb0tunixPathScripting))
+                if (!Directory.Exists(lib0tPathScripting))
                 {
                     return String.Empty;
                 }
@@ -89,9 +89,9 @@ namespace lib0t
 
             try
             {
-                if (!Directory.Exists(sb0tunixPathScripting))
+                if (!Directory.Exists(lib0tPathScripting))
                 {
-                    Directory.CreateDirectory(sb0tunixPathScripting);
+                    Directory.CreateDirectory(lib0tPathScripting);
                 }
                 if (!File.Exists(filenameScripting))
                 {
@@ -115,7 +115,7 @@ namespace lib0t
 
             try
             {
-                if (!Directory.Exists(sb0tunixPathScripting))
+                if (!Directory.Exists(lib0tPathScripting))
                 {
                     return false;
                 }
@@ -141,7 +141,7 @@ namespace lib0t
 
             try
             {
-                if (!Directory.Exists(sb0tunixPathScripting))
+                if (!Directory.Exists(lib0tPathScripting))
                 {
                     return false;
                 }
