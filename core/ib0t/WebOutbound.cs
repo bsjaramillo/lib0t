@@ -74,7 +74,10 @@ namespace core.ib0t
             String text = Settings.VERSION;
             return WebSockets.Html5TextPacket("PERSMSG:" + name.Length + "," + text.Length + ":" + name + text, userobj.WebCredentials.OldProto);
         }
-
+        public static byte[] Redirect(ib0tClient userobj, Room room)
+        {
+            return WebSockets.Html5TextPacket("REDIRECT:" + room.IP.ToString().Length + "," + room.Port.ToString().Length + "," + room.Name.Length + ":" + room.IP.ToString() + room.Port.ToString() + room.Name, userobj.WebCredentials.OldProto);
+        }
         public static byte[] AvatarTo(ib0tClient userobj, String name, byte[] av)
         {
             String str = "AVATAR:";
