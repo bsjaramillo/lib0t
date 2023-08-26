@@ -190,10 +190,10 @@ namespace core.ib0t
             String base64 = img;
             List<String> packets = new List<String>();
 
-            while (base64.Length > 1024)
+            while (base64.Length > 30000)
             {
-                packets.Add(base64.Substring(0, 1024));
-                base64 = base64.Substring(1024);
+                packets.Add(base64.Substring(0, 30000));
+                base64 = base64.Substring(30000);
             }
 
             if (base64.Length > 0)
@@ -204,6 +204,31 @@ namespace core.ib0t
             foreach (String str in packets)
                 this.QueuePacket(WebOutbound.ScribbleBlock(this, str));
         }
+
+        public void PmScribble(String sender, String img, int h)
+        {
+            if (!this.Extended || !this.ProtoConnected)
+                return;
+            if (!(this.IsInbizierMobile || this.IsInbizierWeb))
+                return;
+            String height = h.ToString();
+            String base64 = img;
+            List<String> packets = new List<String>();
+
+            while (base64.Length > 30000)
+            {
+                packets.Add(base64.Substring(0, 30000));
+                base64 = base64.Substring(30000);
+            }
+
+            if (base64.Length > 0)
+                packets.Add(base64);
+
+            this.QueuePacket(WebOutbound.PmScribbleHead(this, sender, packets.Count, height));
+            foreach (String str in packets)
+                this.QueuePacket(WebOutbound.PmScribbleBlock(this, sender, str));
+        }
+
         public void Scribble2(String sender, String img)
         {
             if (!this.Extended || !this.ProtoConnected)
@@ -233,10 +258,10 @@ namespace core.ib0t
 
             List<String> packets = new List<String>();
 
-            while (base64.Length > 4096)
+            while (base64.Length > 30000)
             {
-                packets.Add(base64.Substring(0, 1024));
-                base64 = base64.Substring(1024);
+                packets.Add(base64.Substring(0, 30000));
+                base64 = base64.Substring(30000);
             }
 
             if (base64.Length > 0)
@@ -247,6 +272,32 @@ namespace core.ib0t
             foreach (String str in packets)
                 this.QueuePacket(WebOutbound.AudioBlock(this, str));
         }
+
+        public void PmAudio(String sender, String base64)
+        {
+            if (!this.Extended || !this.ProtoConnected)
+                return;
+
+            if (!(this.IsInbizierMobile || this.IsInbizierWeb))
+                return;
+
+            List<String> packets = new List<String>();
+
+            while (base64.Length > 30000)
+            {
+                packets.Add(base64.Substring(0, 30000));
+                base64 = base64.Substring(30000);
+            }
+
+            if (base64.Length > 0)
+                packets.Add(base64);
+
+            this.QueuePacket(WebOutbound.PmAudioHead(this, sender, packets.Count));
+
+            foreach (String str in packets)
+                this.QueuePacket(WebOutbound.PmAudioBlock(this, sender, str));
+        }
+
         public void Nudge(String sender) { }
 
         private bool _muzzled;

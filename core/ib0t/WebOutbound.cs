@@ -32,7 +32,7 @@ namespace core.ib0t
         }
         public static byte[] ServerInfo(ib0tClient userobj)
         {
-            return WebSockets.Html5TextPacket("SERVER_INFO:1:I" , userobj.WebCredentials.OldProto);
+            return WebSockets.Html5TextPacket("SERVER_INFO:2:II", userobj.WebCredentials.OldProto);
         }
         public static byte[] BuzzTo(ib0tClient userobj,String target)
         {
@@ -130,6 +130,14 @@ namespace core.ib0t
                                                                  ":" + sender + count + height,
                                                                  userobj.WebCredentials.OldProto);
         }
+
+        public static byte[] PmScribbleHead(ib0tClient userobj, String sender, int count, String height)
+        {
+            return WebSockets.Html5TextPacket("PM_SCRIBBLE_HEAD:" + sender.Length + "," +
+                                                                 count.ToString().Length +
+                                                                 ":" + sender + count,
+                                                                 userobj.WebCredentials.OldProto);
+        }
         public static byte[] ScribbleHead(ib0tClient userobj, String sender, int count)
         {
             return WebSockets.Html5TextPacket("SCRIBBLE_HEAD:" + sender.Length + "," +
@@ -148,6 +156,12 @@ namespace core.ib0t
         {
             return WebSockets.Html5TextPacket("SCRIBBLE_BLOCK:" + text.Length + ":" + text, userobj.WebCredentials.OldProto);
         }
+
+        public static byte[] PmScribbleBlock(ib0tClient userobj, String sender, String text)
+        {
+            return WebSockets.Html5TextPacket("PM_SCRIBBLE_BLOCK:" + sender.Length + "," + text.Length + ":" + sender + text, userobj.WebCredentials.OldProto);
+        }
+
         public static byte[] ScribbleSourceBlock(ib0tClient userobj, String text)
         {
             return WebSockets.Html5TextPacket("SCRIBBLESOURCE_BLOCK:" + text.Length + ":" + text, userobj.WebCredentials.OldProto);
@@ -163,6 +177,20 @@ namespace core.ib0t
         {
             return WebSockets.Html5TextPacket("AUDIO_BLOCK:" + text.Length + ":" + text, userobj.WebCredentials.OldProto);
         }
+
+        public static byte[] PmAudioHead(ib0tClient userobj, String sender, int count)
+        {
+            return WebSockets.Html5TextPacket("PM_AUDIO_HEAD:" + sender.Length + "," +
+                                                                 count.ToString().Length +
+                                                                 ":" + sender + count,
+                                                                 userobj.WebCredentials.OldProto);
+        }
+
+        public static byte[] PmAudioBlock(ib0tClient userobj, String sender, String text)
+        {
+            return WebSockets.Html5TextPacket("PM_AUDIO_BLOCK:" + sender.Length + "," + text.Length + ":" + sender + text, userobj.WebCredentials.OldProto);
+        }
+
         public static byte[] UpdateTo(ib0tClient userobj, String name, ILevel level)
         {
             return WebSockets.Html5TextPacket("UPDATE:" + name.Length + ",1:" + name + ((byte)level), userobj.WebCredentials.OldProto);

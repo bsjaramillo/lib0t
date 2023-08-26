@@ -61,6 +61,20 @@ namespace core.ib0t
                 case "BUZZ":
                     Buzz(client, args);
                     break;
+
+                case "CUSTOM_DATA_HEAD":
+                    CustomDataHead(client, args);
+                    break;
+                case "CUSTOM_DATA_BODY":
+                    CustomDataBody(client, args);
+                    break;
+                case "PM_CUSTOM_DATA_HEAD":
+                    PmCustomDataHead(client, args);
+                    break;
+                case "PM_CUSTOM_DATA_BODY":
+                    PmCustomDataBody(client, args);
+                    break;
+
                 case "LOGIN":
                     Login(client, args, time);
                     break;
@@ -106,6 +120,109 @@ namespace core.ib0t
 
                 default:
                     throw new Exception();
+            }
+        }
+
+        private static Dictionary<String, CustomData> customData = new Dictionary<string, CustomData>();
+        private static Dictionary<String, PmCustomData> pmCustomData = new Dictionary<string, PmCustomData>();
+
+        private static void CustomDataHead(ib0tClient client, String packet)
+        {
+            String[] arg_items = GetArgItems(packet);
+            String size = arg_items[2];
+            String sender = arg_items[0];
+            String id = arg_items[1];
+            if (customData.ContainsKey(id)) return;
+            CustomData newCustomDataHead = new CustomData();
+            newCustomDataHead.data = "";
+            newCustomDataHead.sender = sender;
+            newCustomDataHead.size = UInt16.Parse(size);
+            newCustomDataHead.count = 0;
+            customData.Add(id, newCustomDataHead);
+        }
+        private static void CustomDataBody(ib0tClient client, String packet)
+        {
+            try
+            {
+                String[] arg_items = GetArgItems(packet);
+                String data = arg_items[2];
+                String id = arg_items[1];
+                String type = arg_items[0];
+                if (!customData.ContainsKey(id)) return;
+                customData[id].data = customData[id].data + data;
+                customData[id].count++;
+                if (customData[id].count == customData[id].size)
+                {
+                    SendCustomData(client, type, customData[id].toPacket());
+                    customData.Remove(id);
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+            }
+
+        }
+        private static void PmCustomDataHead(ib0tClient client, String packet)
+        {
+            String[] arg_items = GetArgItems(packet);
+            String size = arg_items[2];
+            String target = arg_items[0];
+            String id = arg_items[1];
+            if (pmCustomData.ContainsKey(id)) return;
+            PmCustomData newCustomDataHead = new PmCustomData();
+            newCustomDataHead.data = "";
+            newCustomDataHead.target = target;
+            newCustomDataHead.size = UInt16.Parse(size);
+            newCustomDataHead.count = 0;
+            pmCustomData.Add(id, newCustomDataHead);
+        }
+        private static void PmCustomDataBody(ib0tClient client, String packet)
+        {
+            try
+            {
+                String[] arg_items = GetArgItems(packet);
+                String data = arg_items[2];
+                String id = arg_items[1];
+                String type = arg_items[0];
+                if (!pmCustomData.ContainsKey(id)) return;
+                pmCustomData[id].data = pmCustomData[id].data + data;
+                pmCustomData[id].count++;
+                if (pmCustomData[id].count == pmCustomData[id].size)
+                {
+                    SendPmCustomData(client, type, pmCustomData[id].toPacket());
+                    pmCustomData.Remove(id);
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+            }
+
+        }
+
+        private static void SendCustomData(ib0tClient client, String type, String packet)
+        {
+            switch (type)
+            {
+                case "SCRIBBLE":
+                    Scribble(client, packet);
+                    break;
+                case "AUDIO":
+                    Audio(client, packet);
+                    break;
+            }
+        }
+        private static void SendPmCustomData(ib0tClient client, String type, String packet)
+        {
+            switch (type)
+            {
+                case "SCRIBBLE":
+                    PmScribble(client, packet);
+                    break;
+                case "AUDIO":
+                    PmAudio(client, packet);
+                    break;
             }
         }
 
@@ -194,6 +311,48 @@ namespace core.ib0t
                 }
             }
         }
+
+        private static void PmScribble(ib0tClient client, String packet)
+        {
+            String[] arg_items = GetArgItems(packet);
+            String text = arg_items[1];
+            String name = arg_items[0];
+            int height = 300;
+            PMEventArgs args = new PMEventArgs { Cancel = false, Text = text };
+            if (Settings.Get<bool>("scribbles", "CommandsSettings"))
+            {
+                try
+                {
+                    if (name == Settings.Get<String>("botName","MainSettings")) return;
+                    ib0tClient target = UserPool.WUsers.Find(x => x.Name == name && x.LoggedIn && (x.IsInbizierMobile || x.IsInbizierWeb));
+                    if (target == null)
+                        client.QueuePacket(WebOutbound.OfflineTo(client, name));
+                    else if (target.IgnoreList.Contains(client.Name) || client.Muzzled)
+                        client.QueuePacket(WebOutbound.IgnoringTo(client, name));
+                    else
+                    {
+                        if (target.Cloaked)
+                        {
+                            client.QueuePacket(WebOutbound.OfflineTo(client, name));
+                            return;
+                        }
+
+                        Events.PrivateSending(client, target, args);
+
+                        if (!args.Cancel && !String.IsNullOrEmpty(args.Text) && client.SocketConnected)
+                        {
+                            target.PmScribble(client.Name, args.Text, height);
+                            Events.PrivateSent(client, target, args.Text);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+
         private static void ScribbleSource(ib0tClient client, String packet)
         {
             String[] arg_items = GetArgItems(packet);
@@ -228,6 +387,46 @@ namespace core.ib0t
                     x => x.LoggedIn && x.Vroom == client.Vroom && !x.Quarantined && x.Extended && !(x.IsInbizierMobile || x.IsInbizierWeb));
                     UserPool.AUsers.ForEachWhere(x => x.SendPacket(TCPOutbound.NoSuch(x, sender + " ha enviado un audio desde inbizio.")),
                     x => x.LoggedIn && x.Vroom == client.Vroom && !x.Quarantined);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+
+        private static void PmAudio(ib0tClient client, String packet)
+        {
+            String[] arg_items = GetArgItems(packet);
+            String text = arg_items[1];
+            String name = arg_items[0];
+            PMEventArgs args = new PMEventArgs { Cancel = false, Text = text };
+            if (Settings.Get<bool>("audios", "CommandsSettings"))
+            {
+                try
+                {
+                    if (name == Settings.Get<String>("botName","MainSettings")) return;
+                    ib0tClient target = UserPool.WUsers.Find(x => x.Name == name && x.LoggedIn && (x.IsInbizierMobile || x.IsInbizierWeb));
+                    if (target == null)
+                        client.QueuePacket(WebOutbound.OfflineTo(client, name));
+                    else if (target.IgnoreList.Contains(client.Name) || client.Muzzled)
+                        client.QueuePacket(WebOutbound.IgnoringTo(client, name));
+                    else
+                    {
+                        if (target.Cloaked)
+                        {
+                            client.QueuePacket(WebOutbound.OfflineTo(client, name));
+                            return;
+                        }
+
+                        Events.PrivateSending(client, target, args);
+
+                        if (!args.Cancel && !String.IsNullOrEmpty(args.Text) && client.SocketConnected)
+                        {
+                            target.PmAudio(client.Name, args.Text);
+                            Events.PrivateSent(client, target, args.Text);
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -644,7 +843,7 @@ namespace core.ib0t
                 }
 
                 client.LoggedIn = true;
-                client.QueuePacket(WebOutbound.PublicTo(client,String.Empty,Settings.VERSION + " - " + Settings.RELEASE_URL));
+                client.QueuePacket(WebOutbound.PublicTo(client,String.Empty,"Server: "+Settings.VERSION + " - " + Settings.RELEASE_URL));
                 client.QueuePacket(WebOutbound.AckTo(client, client.Name));
                 if (client.IsInbizierMobile || client.IsInbizierWeb)
                 {
