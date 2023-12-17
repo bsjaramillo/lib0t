@@ -16,25 +16,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-﻿using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Text;
 using System.Net;
-using System.IO;
-using System.Threading;
 using iconnect;
 using System.IO.Compression;
-using System.Reflection;
 using Newtonsoft.Json;
-using Windows.Media.Protection.PlayReady;
+using System.Text.RegularExpressions;
+using lib0t;
 
 namespace scripting
 {
     class LiveScript
     {
         private static ConcurrentQueue<LiveScriptItem> items = new ConcurrentQueue<LiveScriptItem>();
+        public static String liveScriptsEndpoint = Reginux.appSettings.AdvancedSettings.livescriptEndpoint;
 
         public static void Reset()
         {
@@ -56,11 +52,11 @@ namespace scripting
                             break;
 
                         case ListScriptReceiveType.Failed:
-                            Server.Print("unable to download from live script: " + i.Args);
+                            Server.Print("Unable to get the script with path: " + i.Args);
                             break;
 
                         case ListScriptReceiveType.ReadyLoad:
-                            Server.Print("successfully downloaded from live script: " + i.Args);
+                            Server.Print("Successfully downloaded from live script: " + i.Args);
                             ScriptManager.Load(i.Args, true);
                             break;
                     }
@@ -80,14 +76,15 @@ namespace scripting
             }
         }
 
-        public static void ListScripts(IUser target)
+        public static void GetDownload(IUser target, String path)
         {
+            String urlZipRelease = "";
+            ManualResetEvent threadCompletedEvent = new ManualResetEvent(false);
             new Thread(new ThreadStart(() =>
             {
                 try
                 {
-                    WebRequest request = WebRequest.Create("https://raw.githubusercontent.com/bsjaramillo/scriptscommunity/main/listscripts.json");
-
+                    WebRequest request = WebRequest.Create(String.Format("{0}/repos/{1}/releases/latest", liveScriptsEndpoint, path));
                     using (WebResponse response = request.GetResponse())
                     using (Stream stream = response.GetResponseStream())
                     {
@@ -99,55 +96,51 @@ namespace scripting
                             receiver.AddRange(buf.Take(size));
 
                         buf = receiver.ToArray();
-                        items.Enqueue(new LiveScriptItem
-                        {
-                            Target = target,
-                            Type = ListScriptReceiveType.List,
-                            Result = Encoding.Default.GetString(buf)
-                        });
+                        String received = Encoding.Default.GetString(buf);
+                        ReleaseResponse releaseResponse = JsonConvert.DeserializeObject<ReleaseResponse>(received);
+                        urlZipRelease = releaseResponse.ZipballUrl;
                     }
                 }
-                catch { }
-            })).Start();
-        }
-        public static void LiveScripts(IUser target)
-        {
-            new Thread(new ThreadStart(() =>
-            {
-                try
+                catch
                 {
-                    WebRequest request = WebRequest.Create("https://raw.githubusercontent.com/bsjaramillo/scriptscommunity/main/listscripts.json");
 
-                    using (WebResponse response = request.GetResponse())
-                    using (Stream stream = response.GetResponseStream())
+                }
+                finally
+                {
+                    threadCompletedEvent.Set();
+                }
+            })).Start();
+            bool completed = threadCompletedEvent.WaitOne(TimeSpan.FromSeconds(5));
+            if (completed)
+            {
+                if (urlZipRelease == "")
+                    items.Enqueue(new LiveScriptItem
                     {
-                        List<byte> receiver = new List<byte>();
-                        byte[] buf = new byte[1024];
-                        int size = 0;
-
-                        while ((size = stream.Read(buf, 0, 1024)) > 0)
-                            receiver.AddRange(buf.Take(size));
-
-                        buf = receiver.ToArray();
-                        String result= Encoding.Default.GetString(buf);
-                        List<LiveScriptItem2> scriptsResult=JsonConvert.DeserializeObject<List<LiveScriptItem2>>(result);
-                        target.Print("Scripts Repo: https://github.com/bsjaramillo/scriptscommunity\n");
-                        scriptsResult.ForEach(x =>
-                        {
-                            target.Print(String.Format("Script: {0}\nAuthor:{1}\nDescription: {2}\n", x.name,x.author,x.description));
-                        });
-                    }
+                        Type = ListScriptReceiveType.Failed,
+                        Args = path
+                    });
+                else
+                {
+                    String filename = path.Split('/')[1];
+                    Download(urlZipRelease, filename, path);
                 }
-                catch { }
-            })).Start();
+            }
+            else
+                items.Enqueue(new LiveScriptItem
+                {
+                    Type = ListScriptReceiveType.Failed,
+                    Args = path
+                });
         }
-        public static void Download(String filename)
+
+        
+        public static void Download(String url, String filename, String pathScript)
         {
             new Thread(new ThreadStart(() =>
             {
                 try
                 {
-                    WebRequest request = WebRequest.Create("https://github.com/bsjaramillo/scriptscommunity/raw/main/" + filename +".zip");
+                    WebRequest request = WebRequest.Create(url);
 
                     using (WebResponse response = request.GetResponse())
                     using (Stream stream = response.GetResponseStream())
@@ -166,84 +159,114 @@ namespace scripting
                             items.Enqueue(new LiveScriptItem
                             {
                                 Type = ListScriptReceiveType.Failed,
-                                Args = filename
+                                Args = pathScript
                             });
                         else
                         {
-                            int index = ScriptManager.Scripts.FindIndex(x => x.ScriptName == filename);
-                            if (index>0) {
+                            int index = ScriptManager.Scripts.FindIndex(x => x.ScriptName == filename + ".js");
+                            if (index > 0)
+                            {
                                 ScriptManager.Scripts[index].KillScript();
                                 ScriptManager.Scripts.RemoveAt(index);
                             }
-                            String pathzip = Path.Combine(Server.DataPath, filename +".zip");
+                            String pathzip = Path.Combine(Server.DataPath, filename + ".zip");
                             String path = Path.Combine(Server.DataPath, filename);
-                            if (Directory.Exists(path))
-                                Directory.Delete(path,true);
+                            if (Directory.Exists(path + ".js"))
+                                Directory.Delete(path + ".js", true);
                             if (File.Exists(pathzip))
                                 File.Delete(pathzip);
                             File.WriteAllBytes(pathzip, buf);
-                            ZipFile.ExtractToDirectory(pathzip, Server.DataPath,true);
+                            ZipFile.ExtractToDirectory(pathzip, Server.DataPath);
                             File.Delete(pathzip);
+                            Directory.Move(path, path + ".js");
                             items.Enqueue(new LiveScriptItem
                             {
                                 Type = ListScriptReceiveType.ReadyLoad,
-                                Args = filename
+                                Args = filename + ".js"
                             });
                         }
                     }
                 }
                 catch(Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine(e.Message);
                     items.Enqueue(new LiveScriptItem
                     {
                         Type = ListScriptReceiveType.Failed,
-                        Args = filename
+                        Args = pathScript
                     });
                 }
             })).Start();
         }
-
-        private static String GetFile(String script, String filename)
+        public static void LiveScripts(IUser target)
         {
-            String result = null;
-
-            try
+            new Thread(new ThreadStart(() =>
             {
-                WebRequest request = WebRequest.Create("http://chatrooms.marsproject.net/livescript/callisto.aspx?action=download&script=" + script + "&name=" + filename);
-
-                using (WebResponse response = request.GetResponse())
-                using (Stream stream = response.GetResponseStream())
+                try
                 {
-                    List<byte> receiver = new List<byte>();
-                    byte[] buf = new byte[1024];
-                    int size = 0;
+                    WebRequest request = WebRequest.Create(String.Format("{0}/repos/search?private=false&is_private=false&archived=false", liveScriptsEndpoint));
 
-                    while ((size = stream.Read(buf, 0, 1024)) > 0)
-                        receiver.AddRange(buf.Take(size));
+                    using (WebResponse response = request.GetResponse())
+                    using (Stream stream = response.GetResponseStream())
+                    {
+                        List<byte> receiver = new List<byte>();
+                        byte[] buf = new byte[1024];
+                        int size = 0;
 
-                    buf = receiver.ToArray();
-                    result = Encoding.UTF8.GetString(buf);
+                        while ((size = stream.Read(buf, 0, 1024)) > 0)
+                            receiver.AddRange(buf.Take(size));
+
+                        buf = receiver.ToArray();
+                        String result = Encoding.Default.GetString(buf);
+                        ApiResponse apiResponse = JsonConvert.DeserializeObject<ApiResponse>(result);
+                        target.Print(String.Format("Scripts Repo: {0}/explore/repos", ExtractDomain(liveScriptsEndpoint)));
+                        if (apiResponse.Ok)
+                        {
+                            if (apiResponse.Data.Count == 0)
+                                target.Print("No scripts available");
+                            apiResponse.Data.ForEach(x =>
+                            {
+                                if (x.ReleaseCounter > 0)
+                                    target.Print(String.Format("\x06Script: \x06{0}  \x06 Author: \x06{1}  \x06Path: \x06{2}  \x06 Description: \x06{3}", x.Name, x.Owner.Username, x.FullName, x.Description));
+                            });
+                        }
+                        else
+                            target.Print("Unable to get live scripts list");
+                    }
                 }
-            }
-            catch { }
-
-            return result;
+                catch {
+                    target.Print("Unable to get live scripts list");
+                }
+            })).Start();
         }
+        private static string ExtractDomain(string url)
+        {
+            // Expresión regular para extraer el dominio y el puerto de la URL
+            string pattern = @"^(https?://[^/]+)";
+
+            // Crear un objeto Regex
+            Regex regex = new Regex(pattern);
+
+            // Utilizar el método Regex.Match para obtener la coincidencia
+            Match match = regex.Match(url);
+
+            // Verificar si hay una coincidencia y obtener el valor capturado
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+
+            return null;
+        }
+
     }
 
+    
     class LiveScriptItem
     {
         public IUser Target { get; set; }
         public ListScriptReceiveType Type { get; set; }
         public String Result { get; set; }
         public String Args { get; set; }
-    }
-    class LiveScriptItem2
-    {
-        public String description { get; set; }
-        public String author { get; set; }
-        public String name { get; set; }
     }
     enum ListScriptReceiveType
     {

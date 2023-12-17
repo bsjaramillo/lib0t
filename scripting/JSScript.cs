@@ -28,6 +28,7 @@ using scripting.ObjectPrototypes;
 using scripting.Statics;
 using scripting.Instances;
 using Windows.UI.Xaml;
+using Jurassic.Compiler;
 
 namespace scripting
 {
@@ -228,6 +229,12 @@ namespace scripting
             }
             catch (JavaScriptException e)
             {
+                Server.Print(String.Format("Unable to load script {0} \x06{1} - LineReference: {2}", this.ScriptName, e.Message, e.LineNumber));
+                ErrorDispatcher.SendError(this.ScriptName, e.Message, e.LineNumber);
+            }
+            catch (SyntaxErrorException e)
+            {
+                Server.Print(String.Format("Unable to load script {0} \x06{1} - LineReference: {2}", this.ScriptName, e.Message, e.LineNumber));
                 ErrorDispatcher.SendError(this.ScriptName, e.Message, e.LineNumber);
             }
             catch { }

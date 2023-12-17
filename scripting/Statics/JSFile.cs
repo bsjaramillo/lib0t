@@ -58,7 +58,13 @@ namespace scripting.Statics
 
                         try
                         {
-                            return File.ReadAllText(path);
+                            // Leer todas las líneas del archivo
+                            string[] lines = File.ReadAllLines(path);
+
+                            // Eliminar las líneas en blanco y unir el resultado
+                            string contentWithoutBlankLines = string.Join(Environment.NewLine, lines.Where(line => !string.IsNullOrWhiteSpace(line)));
+
+                            return contentWithoutBlankLines;
                         }
                         catch { }
                     }
@@ -140,6 +146,41 @@ namespace scripting.Statics
                             Directory.CreateDirectory(path);
 
                         path = Path.Combine(Server.DataPath, eng.GetGlobalValue("UserData").ToString(), "data", file);
+
+                        using (StreamWriter stream = File.Exists(path) ? File.AppendText(path) : File.CreateText(path))
+                            stream.Write(content);
+
+                        return true;
+                    }
+                    catch { }
+                }
+
+            return false;
+        }
+
+        [JSFunction(Name = "appendLine", Flags = JSFunctionFlags.HasEngineParameter, IsWritable = false, IsEnumerable = true)]
+        public static bool JSAppendLine(ScriptEngine eng, object a, object b) // file, content
+        {
+            if (!(a is String || a is ConcatenatedString) || !(b is String || b is ConcatenatedString))
+                return false;
+
+            String file = a.ToString();
+            String script = eng.GetGlobalValue("UserData").ToString();
+            String content = b.ToString();
+
+            if (file.Length > 1)
+                if (bad_chars_script.Count<String>(x => file.Contains(x)) == 0)
+                {
+                    try
+                    {
+                        String path = Path.Combine(Server.DataPath, eng.GetGlobalValue("UserData").ToString(), "data");
+
+                        if (!Directory.Exists(path))
+                            Directory.CreateDirectory(path);
+
+                        path = Path.Combine(Server.DataPath, eng.GetGlobalValue("UserData").ToString(), "data", file);
+                        // Agregar el contenido a una nueva línea
+                        content = content.TrimEnd('\r', '\n') + Environment.NewLine;
 
                         using (StreamWriter stream = File.Exists(path) ? File.AppendText(path) : File.CreateText(path))
                             stream.Write(content);

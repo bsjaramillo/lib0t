@@ -33,7 +33,7 @@ namespace core
     {
         public const String RELEASE_URL = "https://hub.docker.com/r/bsjaramillo/lib0t";
         public const String VERSION_CHECK_URL = "https://api.github.com/repos/bsjaramillo/lib0t/releases";
-        public const String VERSION_NUMBER = "6.0.3";
+        public const String VERSION_NUMBER = "6.1.0";
 
         public const String VERSION = "lib0t " + VERSION_NUMBER;
         public const ushort LINK_PROTO = 500;

@@ -35,7 +35,7 @@ namespace lib0t
         public bool hideIpAddresses { get; set; }
         public bool enableRoomSearch { get; set; }
         public bool localClientsAutoLogin { get; set; }
-        public string ib0tChannelListReceiverScript { get; set; }
+        public string livescriptEndpoint { get; set; }
         public string UDPHostAddress { get; set; }
         public int preferredLanguage { get; set; }
         public bool restrictions { get; set; }
