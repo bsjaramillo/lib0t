@@ -689,18 +689,22 @@ namespace core.ib0t
         public byte[] Scale(byte[] raw)
         {
             byte[] result;
-
-            using (var avatar_raw = new MagickImage(raw))
-            {
-                avatar_raw.Resize(48,48);
-                using (MemoryStream ms = new MemoryStream())
+            try {
+                using (var avatar_raw = new MagickImage(raw))
                 {
-                    avatar_raw.Write(ms);
-                    byte[] img_buffer = ms.ToArray();
-                    result = img_buffer;
+                    avatar_raw.Resize(48, 48);
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        avatar_raw.Write(ms);
+                        byte[] img_buffer = ms.ToArray();
+                        result = img_buffer;
+                    }
                 }
             }
-
+            catch (MagickException e)
+            {
+                throw new Exception("error scaling avatar "+e.Message);
+            }
             return result;
         }
         public void BinaryWrite(byte[] data)

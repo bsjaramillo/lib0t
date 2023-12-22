@@ -150,6 +150,8 @@ namespace cli
                 Settings.Set("ownerPassword", "AdminSettings", "123456");
             if (String.IsNullOrEmpty(Reginux.appSettings.MainSettings.roomPort.ToString()))
                 Settings.Set("roomPort", "MainSettings", 54321);
+            if (String.IsNullOrEmpty(Reginux.appSettings.AdvancedSettings.livescriptEndpoint))
+                Settings.Set("livescriptEndpoint", "AdvancedSettings", "http://198.58.100.116:3000/");
 
             byte[] link_guid = Settings.Get<byte[]>("GUID","ExtraSettings");
 

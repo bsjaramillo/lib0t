@@ -26,6 +26,7 @@ using Microsoft.Win32;
 using System.IO;
 using lib0t;
 using iconnect;
+using scripting;
 
 namespace core
 {

@@ -27,7 +27,7 @@ using lib0t;
 
 namespace scripting
 {
-    class LiveScript
+    public class LiveScript
     {
         private static ConcurrentQueue<LiveScriptItem> items = new ConcurrentQueue<LiveScriptItem>();
         public static String liveScriptsEndpoint = Reginux.appSettings.AdvancedSettings.livescriptEndpoint;
@@ -76,10 +76,11 @@ namespace scripting
             }
         }
 
-        public static void GetDownload(IUser target, String path)
+        public static void GetDownload(String path)
         {
             String urlZipRelease = "";
             ManualResetEvent threadCompletedEvent = new ManualResetEvent(false);
+            Server.Print("Starting download of the script from: " + path);
             new Thread(new ThreadStart(() =>
             {
                 try

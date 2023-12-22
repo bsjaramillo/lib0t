@@ -286,17 +286,18 @@ namespace core.ib0t
         }
         private static void Scribble(ib0tClient client, String packet)
         {
-            String[] arg_items = GetArgItems(packet);
-            String text = arg_items[1];
-            String sender=arg_items[0];
-            byte[] img = Convert.FromBase64String(text);
-            var data = Scale(img);
-            int height = 300;
+            
             if (Settings.Get<bool>("scribbles", "CommandsSettings"))
             {
                 
                 try
                 {
+                    String[] arg_items = GetArgItems(packet);
+                    String text = arg_items[1];
+                    String sender = arg_items[0];
+                    byte[] img = Convert.FromBase64String(text);
+                    var data = Scale(img);
+                    int height = 300;
                     UserPool.AUsers.ForEachWhere(x => x.SendPacket(TCPOutbound.NoSuch(x,String.Format("Scribble from {0}",sender))),
                                 x => x.LoggedIn && !x.Quarantined && x.Vroom == client.Vroom);
                     UserPool.AUsers.ForEachWhere(x => x.Scribble(Settings.Get<String>("botName","MainSettings"), data.Item1, data.Item3),
@@ -314,15 +315,16 @@ namespace core.ib0t
 
         private static void PmScribble(ib0tClient client, String packet)
         {
-            String[] arg_items = GetArgItems(packet);
-            String text = arg_items[1];
-            String name = arg_items[0];
-            int height = 300;
-            PMEventArgs args = new PMEventArgs { Cancel = false, Text = text };
+            
             if (Settings.Get<bool>("scribbles", "CommandsSettings"))
             {
                 try
                 {
+                    String[] arg_items = GetArgItems(packet);
+                    String text = arg_items[1];
+                    String name = arg_items[0];
+                    int height = 300;
+                    PMEventArgs args = new PMEventArgs { Cancel = false, Text = text };
                     if (name == Settings.Get<String>("botName","MainSettings")) return;
                     ib0tClient target = UserPool.WUsers.Find(x => x.Name == name && x.LoggedIn && (x.IsInbizierMobile || x.IsInbizierWeb));
                     if (target == null)
@@ -702,7 +704,8 @@ namespace core.ib0t
             {
                 try
                 {
-                    if (arg_items[6] !="/default.png") {
+                    if (arg_items[6] != "/default.png")
+                    {
                         byte[] fullavatar = Convert.FromBase64String(arg_items[6]);
                         byte[] avatar = client.Scale(fullavatar);
                         if (!client.Avatar.SequenceEqual(avatar))
@@ -717,13 +720,10 @@ namespace core.ib0t
                                         client.DefaultAvatar = false;
                                     }
                     }
-                    
+
                     client.PersonalMessage = arg_items[5];
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                catch { }
             }
             if (!client.Captcha)
                 client.Captcha = CaptchaManager.HasCaptcha(client);
