@@ -27,7 +27,10 @@ using captcha;
 using iconnect;
 using System.IO;
 using System.Windows;
-using ImageMagick;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace core.ib0t
 {
@@ -257,14 +260,14 @@ namespace core.ib0t
         {
             byte[] result = null;
             int x, y;
-            using (var avatar_raw = new MagickImage(raw))
+            using (Image image = Image.Load<Rgba32>(raw))
             {
-                int img_x = avatar_raw.Width;
-                int img_y = avatar_raw.Height;
+                int img_x = image.Width;
+                int img_y = image.Height;
                 if (img_x > 384)
                 {
                     img_x = 384;
-                    img_y = avatar_raw.Height - (int)Math.Floor(Math.Floor((double)avatar_raw.Height / 100) * Math.Floor(((double)(avatar_raw.Width - 384) / avatar_raw.Width) * 100));
+                    img_y = image.Height - (int)Math.Floor(Math.Floor((double)image.Height / 100) * Math.Floor(((double)(image.Width - 384) / image.Width) * 100));
                 }
 
                 if (img_y > 384)
@@ -274,12 +277,12 @@ namespace core.ib0t
                 }
                 x = img_x;
                 y = img_y;
-                avatar_raw.Resize(x, y);
-                using (MemoryStream ms = new MemoryStream())
+                Size size = new Size(x,y);
+                image.Mutate(x => x.Resize(size));
+                using (var memoryStream = new MemoryStream())
                 {
-                   avatar_raw.Write(ms);
-                    byte[] img_buffer = ms.ToArray();
-                    result = Zip.Compress(img_buffer);
+                    image.Save(memoryStream, new PngEncoder());
+                    result = Zip.Compress(memoryStream.ToArray());
                 }
             }
             return new Tuple<byte[], int, int>(result, x, y);

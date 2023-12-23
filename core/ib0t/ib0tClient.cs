@@ -26,7 +26,11 @@ using System.Net.Sockets;
 using iconnect;
 using Heijden.DNS;
 using System.IO;
-using ImageMagick;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Png;
+using Windows.UI.Xaml;
 
 namespace core.ib0t
 {
@@ -690,18 +694,19 @@ namespace core.ib0t
         {
             byte[] result;
             try {
-                using (var avatar_raw = new MagickImage(raw))
+                using(Image image = Image.Load<Rgba32>(raw))
                 {
-                    avatar_raw.Resize(48, 48);
-                    using (MemoryStream ms = new MemoryStream())
+                    Size size = new Size(48, 48);
+                    image.Mutate(x => x.Resize(size));
+                    using (var memoryStream = new MemoryStream())
                     {
-                        avatar_raw.Write(ms);
-                        byte[] img_buffer = ms.ToArray();
-                        result = img_buffer;
+                        image.Save(memoryStream, new PngEncoder());
+                        result=memoryStream.ToArray();
                     }
                 }
+                
             }
-            catch (MagickException e)
+            catch (Exception e)
             {
                 throw new Exception("error scaling avatar "+e.Message);
             }

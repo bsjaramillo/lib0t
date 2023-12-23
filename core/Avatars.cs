@@ -22,7 +22,10 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Windows.Markup;
-using ImageMagick;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace core
 {
@@ -104,13 +107,14 @@ namespace core
         private static byte[] Scale(byte[] data)
         {
             byte[] result = null;
-            using (var raw = new MagickImage(data))
+            using (Image image = Image.Load<Rgba32>(data))
             {
-                raw.Resize(48, 48);
-                using (MemoryStream ms = new MemoryStream())
+                Size size = new Size(48, 48);
+                image.Mutate(x => x.Resize(size));
+                using (var memoryStream = new MemoryStream())
                 {
-                    raw.Write(ms);
-                    result = Zip.Compress(ms.ToArray());
+                    image.Save(memoryStream, new PngEncoder());
+                    result = Zip.Compress(memoryStream.ToArray());
                 }
             }
             return result;

@@ -24,8 +24,12 @@ using System.Net;
 using System.Threading;
 using Jurassic;
 using Jurassic.Library;
-using ImageMagick;
 using System.IO;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SharpDX;
 
 namespace scripting.Instances
 {
@@ -84,15 +88,15 @@ namespace scripting.Instances
                             while ((received = stream.Read(buf, 0, 1024)) > 0)
                                 bytes_in.AddRange(buf.Take(received));
                     }
-                    using(var avatar_raw = new MagickImage(bytes_in.ToArray()))
+                    using (Image image = Image.Load<Rgba32>(bytes_in.ToArray()))
                     {
-                        int img_x = avatar_raw.Width;
-                        int img_y = avatar_raw.Height;
+                        int img_x = image.Width;
+                        int img_y = image.Height;
 
                         if (img_x > 384)
                         {
                             img_x = 384;
-                            img_y = avatar_raw.Height - (int)Math.Floor(Math.Floor((double)avatar_raw.Height / 100) * Math.Floor(((double)(avatar_raw.Width - 384) / avatar_raw.Width) * 100));
+                            img_y = image.Height - (int)Math.Floor(Math.Floor((double)image.Height / 100) * Math.Floor(((double)(image.Width - 384) / image.Width) * 100));
                         }
 
                         if (img_y > 384)
@@ -100,16 +104,15 @@ namespace scripting.Instances
                             img_x -= (int)Math.Floor(Math.Floor((double)img_x / 100) * Math.Floor(((double)(img_y - 384) / img_y) * 100));
                             img_y = 384;
                         }
-                        avatar_raw.Resize(img_x, img_y);
-                        using (MemoryStream ms = new MemoryStream())
+                        Size size = new Size(img_x, img_y);
+                        image.Mutate(x => x.Resize(size));
+                        using (var memoryStream = new MemoryStream())
                         {
-                            avatar_raw.Write(ms);
-                            result.Height = avatar_raw.Height;
-                            byte[] img_buffer = ms.ToArray();
-                            result.Data = Server.Compression.Compress(img_buffer);
+                            image.Save(memoryStream, new PngEncoder());
+                            result.Height = image.Height;
+                            result.Data = Server.Compression.Compress(memoryStream.ToArray());
                             bytes_in.Clear();
                         }
-                   
                     }
                 }
                 catch (Exception e) {
@@ -153,15 +156,15 @@ namespace scripting.Instances
 
                                 try
                                 {
-                                    using (var avatar_raw = new MagickImage(data))
+                                    using (Image image = Image.Load(path))
                                     {
-                                        int img_x = avatar_raw.Width;
-                                        int img_y = avatar_raw.Height;
+                                        int img_x = image.Width;
+                                        int img_y = image.Height;
 
                                         if (img_x > 384)
                                         {
                                             img_x = 384;
-                                            img_y = avatar_raw.Height - (int)Math.Floor(Math.Floor((double)avatar_raw.Height / 100) * Math.Floor(((double)(avatar_raw.Width - 384) / avatar_raw.Width) * 100));
+                                            img_y = image.Height - (int)Math.Floor(Math.Floor((double)image.Height / 100) * Math.Floor(((double)(image.Width - 384) / image.Width) * 100));
                                         }
 
                                         if (img_y > 384)
@@ -169,16 +172,14 @@ namespace scripting.Instances
                                             img_x -= (int)Math.Floor(Math.Floor((double)img_x / 100) * Math.Floor(((double)(img_y - 384) / img_y) * 100));
                                             img_y = 384;
                                         }
-                                        avatar_raw.Resize(img_x, img_y);
-                                        using (MemoryStream ms = new MemoryStream())
+                                        Size size = new Size(img_x, img_y);
+                                        image.Mutate(x => x.Resize(size));
+                                        using (var memoryStream = new MemoryStream())
                                         {
-                                            avatar_raw.Write(ms);
-                                            scr.Height = avatar_raw.Height;
-                                            byte[] img_buffer = ms.ToArray();
-                                            scr.Data = Server.Compression.Compress(img_buffer);
-                                            
+                                            image.Save(memoryStream, new PngEncoder());
+                                            scr.Height = image.Height;
+                                            scr.Data = Server.Compression.Compress(memoryStream.ToArray());
                                         }
-
                                     }
                                 }
                                 catch { }
