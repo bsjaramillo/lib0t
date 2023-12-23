@@ -205,7 +205,6 @@ namespace scripting
                 try
                 {
                     WebRequest request = WebRequest.Create(String.Format("{0}/repos/search?private=false&is_private=false&archived=false", liveScriptsEndpoint));
-
                     using (WebResponse response = request.GetResponse())
                     using (Stream stream = response.GetResponseStream())
                     {
@@ -234,7 +233,7 @@ namespace scripting
                             target.Print("Unable to get live scripts list");
                     }
                 }
-                catch {
+                catch (Exception e){
                     target.Print("Unable to get live scripts list");
                 }
             })).Start();
