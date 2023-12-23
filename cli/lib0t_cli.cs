@@ -217,12 +217,12 @@ namespace cli
         {
             try
             {
-                //if (args.Length==0)
-                //{
-                //    Console.WriteLine("Error creando la sala, se necesita el nombre del workspace");
-                //    Environment.Exit(0);
-                //}
-                Reginux.Sb0tunixPath = "test"; //args[0];
+                if (args.Length == 0)
+                {
+                    Console.WriteLine("Error creando la sala, se necesita el nombre del workspace");
+                    Environment.Exit(0);
+                }
+                Reginux.Sb0tunixPath = args[0];
                 if (!Directory.Exists(Reginux.Sb0tunixPath))
                 {
                     Console.WriteLine("Error creando la sala, no existe el workspace: "+ Reginux.Sb0tunixPath);
