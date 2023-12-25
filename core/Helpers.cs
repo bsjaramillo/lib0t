@@ -24,8 +24,8 @@ using System.Security.Cryptography;
 using System.Globalization;
 using core.ib0t;
 using iconnect;
-using SixLabors.ImageSharp.PixelFormats;
-
+using ImageMagick;
+using Color = ImageMagick.MagickColors;
 namespace core
 {
     class Helpers
@@ -54,30 +54,11 @@ namespace core
             }
         }
 
-        private static Rgba32[] acols = new Rgba32[]
+        private static MagickColor[] acols = new MagickColor[]
         {
-            ToRgba32(System.Drawing.Color.White),
-            ToRgba32(System.Drawing.Color.Black),
-            ToRgba32(System.Drawing.Color.Navy),
-            ToRgba32(System.Drawing.Color.Green),
-            ToRgba32(System.Drawing.Color.Red),
-            ToRgba32(System.Drawing.Color.Maroon),
-            ToRgba32(System.Drawing.Color.Purple),
-            ToRgba32(System.Drawing.Color.Orange),
-            ToRgba32(System.Drawing.Color.Yellow),
-            ToRgba32(System.Drawing.Color.Lime),
-            ToRgba32(System.Drawing.Color.Teal),
-            ToRgba32(System.Drawing.Color.Aqua),
-            ToRgba32(System.Drawing.Color.Blue),
-            ToRgba32(System.Drawing.Color.Fuchsia),
-            ToRgba32(System.Drawing.Color.Gray),
-            ToRgba32(System.Drawing.Color.Silver)
+            Color.White, Color.Black, Color.Navy, Color.Green, Color.Red, Color.Maroon, Color.Purple, Color.Orange,
+            Color.Yellow, Color.Lime, Color.Teal, Color.Aqua, Color.Blue, Color.Fuchsia, Color.Gray, Color.Silver
         };
-
-        static Rgba32 ToRgba32(System.Drawing.Color color)
-        {
-            return new Rgba32(color.R, color.G, color.B, color.A);
-        }
 
         public static byte HTMLColorToAresColor(String h)
         {

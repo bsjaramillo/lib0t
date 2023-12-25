@@ -27,10 +27,7 @@ using captcha;
 using iconnect;
 using System.IO;
 using System.Windows;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.PixelFormats;
+using ImageMagick;
 
 namespace core.ib0t
 {
@@ -260,14 +257,14 @@ namespace core.ib0t
         {
             byte[] result = null;
             int x, y;
-            using (Image image = Image.Load<Rgba32>(raw))
+            using (var avatar_raw = new MagickImage(raw))
             {
-                int img_x = image.Width;
-                int img_y = image.Height;
+                int img_x = avatar_raw.Width;
+                int img_y = avatar_raw.Height;
                 if (img_x > 384)
                 {
                     img_x = 384;
-                    img_y = image.Height - (int)Math.Floor(Math.Floor((double)image.Height / 100) * Math.Floor(((double)(image.Width - 384) / image.Width) * 100));
+                    img_y = avatar_raw.Height - (int)Math.Floor(Math.Floor((double)avatar_raw.Height / 100) * Math.Floor(((double)(avatar_raw.Width - 384) / avatar_raw.Width) * 100));
                 }
 
                 if (img_y > 384)
@@ -277,12 +274,12 @@ namespace core.ib0t
                 }
                 x = img_x;
                 y = img_y;
-                Size size = new Size(x,y);
-                image.Mutate(x => x.Resize(size));
-                using (var memoryStream = new MemoryStream())
+                avatar_raw.Resize(x, y);
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    image.Save(memoryStream, new PngEncoder());
-                    result = Zip.Compress(memoryStream.ToArray());
+                   avatar_raw.Write(ms);
+                    byte[] img_buffer = ms.ToArray();
+                    result = Zip.Compress(img_buffer);
                 }
             }
             return new Tuple<byte[], int, int>(result, x, y);
@@ -707,6 +704,7 @@ namespace core.ib0t
             {
                 try
                 {
+                    client.PersonalMessage = arg_items[5];
                     if (arg_items[6] != "/default.png")
                     {
                         byte[] fullavatar = Convert.FromBase64String(arg_items[6]);
@@ -723,8 +721,6 @@ namespace core.ib0t
                                         client.DefaultAvatar = false;
                                     }
                     }
-
-                    client.PersonalMessage = arg_items[5];
                 }
                 catch { }
             }

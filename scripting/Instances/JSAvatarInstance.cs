@@ -25,12 +25,8 @@ using System.Net;
 using System.Threading;
 using Jurassic;
 using Jurassic.Library;
+using ImageMagick;
 using SharpDX;
-using SixLabors.ImageSharp.Formats.Png;
-using Windows.UI.Xaml.Shapes;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 
 namespace scripting.Instances
 {
@@ -87,14 +83,13 @@ namespace scripting.Instances
                             while ((received = stream.Read(buf, 0, 1024)) > 0)
                                 bytes_in.AddRange(buf.Take(received));
                     }
-                    using (Image image = Image.Load<Rgba32>(bytes_in.ToArray()))
+                    using(var avatar_raw=new MagickImage(bytes_in.ToArray()))
                     {
-                        Size size = new Size(48,48);
-                        image.Mutate(x => x.Resize(size));
-                        using (var memoryStream = new MemoryStream())
+                        avatar_raw.Resize(48, 48);
+                        using (MemoryStream ms = new MemoryStream())
                         {
-                            image.Save(memoryStream, new PngEncoder());
-                            result.Data = memoryStream.ToArray();
+                            avatar_raw.Write(ms);
+                            result.Data = ms.ToArray();
                             bytes_in.Clear();
                         }
                     }
@@ -130,22 +125,23 @@ namespace scripting.Instances
                 if (filename.Length > 1)
                     if (bad_chars.Count<String>(x => filename.Contains(x)) == 0)
                     {
-                        String path = System.IO.Path.Combine(Server.DataPath, this.Engine.GetGlobalValue("UserData").ToString(), "data", filename);
+                        String path = Path.Combine(Server.DataPath, this.Engine.GetGlobalValue("UserData").ToString(), "data", filename);
 
                         try
                         {
                             if (File.Exists(path))
                             {
-                                using (Image image = Image.Load(path))
+                                byte[] data = File.ReadAllBytes(path);
+                                using (var avatar_raw = new MagickImage(data))
                                 {
-                                    Size size = new Size(48,48);
-                                    image.Mutate(x => x.Resize(size));
-                                    using (var memoryStream = new MemoryStream())
+                                    avatar_raw.Resize(48, 48);
+                                    using (MemoryStream ms = new MemoryStream())
                                     {
-                                        image.Save(memoryStream, new PngEncoder());
-                                        av.Data = memoryStream.ToArray();
+                                        avatar_raw.Write(ms);
+                                        av.Data = ms.ToArray();
                                     }
                                 }
+                                
                             }
                         }
                         catch { }

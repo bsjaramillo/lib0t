@@ -21,11 +21,7 @@ using System.Linq;
 using System.IO;
 using Jurassic;
 using Jurassic.Library;
-using SharpDX;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
+using ImageMagick;
 
 namespace scripting.Objects
 {
@@ -130,17 +126,15 @@ namespace scripting.Objects
         {
             try
             {
-                using (Image image = Image.Load<Rgba32>(data))
+                using (var avatar_raw=new MagickImage(data))
                 {
-                    Size size = new Size(48, 48);
-                    image.Mutate(x => x.Resize(size));
-                    using (var memoryStream = new MemoryStream())
+                    avatar_raw.Resize(48,48);
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        image.Save(memoryStream, new PngEncoder());
-                        this.Data = memoryStream.ToArray();
+                        avatar_raw.Write(ms);
+                        this.Data = ms.ToArray();
                     }
                 }
-               
             }
             catch { }
         }

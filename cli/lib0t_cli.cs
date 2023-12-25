@@ -1,8 +1,6 @@
 ﻿using core;
+using ImageMagick;
 using lib0t;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Processing;
 using System.Text;
 
 namespace cli
@@ -14,15 +12,10 @@ namespace cli
         private byte[] FileToSizedImageSource(string path, int x, int y)
         {
             byte[] result = null;
-            using (Image image = Image.Load(path))
+            using (var raw = new MagickImage(path))
             {
-                Size size = new Size(x, y);
-                image.Mutate(x => x.Resize(size));
-                using (var memoryStream = new MemoryStream())
-                {
-                    image.Save(memoryStream, new PngEncoder());
-                    result= memoryStream.ToArray();
-                }
+                raw.Resize(x, y);
+                result =raw.ToByteArray();
             }
             return result;
         }
@@ -217,7 +210,7 @@ namespace cli
         {
             try
             {
-                if (args.Length == 0)
+                if (args.Length==0)
                 {
                     Console.WriteLine("Error creando la sala, se necesita el nombre del workspace");
                     Environment.Exit(0);
