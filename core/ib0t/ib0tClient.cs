@@ -27,6 +27,7 @@ using iconnect;
 using Heijden.DNS;
 using System.IO;
 using ImageMagick;
+using System.Buffers.Text;
 
 namespace core.ib0t
 {
@@ -142,6 +143,23 @@ namespace core.ib0t
                 return;
             this.QueuePacket(WebOutbound.ScribbleGifTo(this,sender, url));
         }
+
+        public string Base64ToHex(string base64)
+        {
+                byte[] bytes = Convert.FromBase64String(base64);
+                return BitConverter.ToString(bytes).Replace("-", "").ToLower();
+        }
+
+        public string HexToBase64(string hex)
+        {
+                byte[] bytes = new byte[hex.Length / 2];
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+                }
+                return Convert.ToBase64String(bytes);
+        }
+
         public void SetLevel(ILevel level)
         {
             if (!this.LoggedIn)

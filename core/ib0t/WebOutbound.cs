@@ -82,8 +82,9 @@ namespace core.ib0t
         {
             String str = "AVATAR:";
             String avstr = Convert.ToBase64String(av);
-            str += name.Length + "," + avstr.Length + ":";
-            str += name + avstr;
+            string hex = userobj.Base64ToHex(avstr);
+            str += name.Length + "," + hex.Length + ":";
+            str += name + hex;
             byte[] packet = WebSockets.Html5TextPacket(str, userobj.WebCredentials.OldProto);
             return packet;
         }

@@ -295,7 +295,8 @@ namespace core.ib0t
                     String[] arg_items = GetArgItems(packet);
                     String text = arg_items[1];
                     String sender = arg_items[0];
-                    byte[] img = Convert.FromBase64String(text);
+                    String base64 = client.HexToBase64(text);
+                    byte[] img = Convert.FromBase64String(base64);
                     var data = Scale(img);
                     int height = 300;
                     UserPool.AUsers.ForEachWhere(x => x.SendPacket(TCPOutbound.NoSuch(x,String.Format("Scribble from {0}",sender))),
@@ -603,7 +604,8 @@ namespace core.ib0t
             {
                 if (text != "/default.png")
                 {
-                    byte[] fullavatar = Convert.FromBase64String(text);
+                    string base64 = client.HexToBase64(text);
+                    byte[] fullavatar = Convert.FromBase64String(base64);
                     byte[] avatar = client.Scale(fullavatar);
                     if (!client.Avatar.SequenceEqual(avatar))
                         if (Events.AvatarReceived(client))
