@@ -707,7 +707,7 @@ namespace core.ib0t
                 try
                 {
                     client.PersonalMessage = arg_items[5];
-                    if (arg_items[6] != "/default.png" && !String.IsNullOrEmpty(arg_items[6]))
+                    if (arg_items[6] != "/default.png")
                     {
                         byte[] fullavatar = Convert.FromBase64String(arg_items[6]);
                         byte[] avatar = client.Scale(fullavatar);
@@ -850,11 +850,9 @@ namespace core.ib0t
                 {
                     client.QueuePacket(WebOutbound.ServerInfo(client));
                 }
-                else
-                {
-                    client.QueuePacket(WebOutbound.UserlistItemTo(client, Settings.Get<String>("botName", "MainSettings"), ILevel.Host));
-                }
                 client.QueuePacket(WebOutbound.TopicFirstTo(client, Settings.Get<String>("topic","ExtraSettings")));
+                if(!(client.IsInbizierWeb || client.IsInbizierMobile))
+                    client.QueuePacket(WebOutbound.UserlistItemTo(client, Settings.Get<String>("botName", "MainSettings"), ILevel.Host));
 
                 UserPool.AUsers.ForEachWhere(x => client.QueuePacket(
                     client.IsInbizierWeb||client.IsInbizierMobile

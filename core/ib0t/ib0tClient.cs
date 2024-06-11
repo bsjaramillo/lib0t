@@ -647,8 +647,8 @@ namespace core.ib0t
         private byte[] rest_av = null;
         public byte[] Avatar
         {
-            get {
-                if (this.avatar == null || this.avatar.Length == 0)
+            get { 
+                if(this.avatar==null)
                     return Resource1.web;
                 return this.avatar; }
             set
@@ -678,7 +678,7 @@ namespace core.ib0t
         {
             get
             {
-                if (this.fullavatar == null || this.fullavatar.Length == 0)
+                if (this.fullavatar == null)
                     return Resource1.web;
                 return this.fullavatar;
             }
@@ -706,7 +706,7 @@ namespace core.ib0t
         }
         public byte[] Scale(byte[] raw)
         {
-            byte[] result=null;
+            byte[] result;
             try {
                 using (var avatar_raw = new MagickImage(raw))
                 {
