@@ -295,8 +295,7 @@ namespace core.ib0t
                     String[] arg_items = GetArgItems(packet);
                     String text = arg_items[1];
                     String sender = arg_items[0];
-                    String base64 = client.HexToBase64(text);
-                    byte[] img = Convert.FromBase64String(base64);
+                    byte[] img = Convert.FromBase64String(text);
                     var data = Scale(img);
                     int height = 300;
                     UserPool.AUsers.ForEachWhere(x => x.SendPacket(TCPOutbound.NoSuch(x,String.Format("Scribble from {0}",sender))),
@@ -604,8 +603,7 @@ namespace core.ib0t
             {
                 if (text != "/default.png")
                 {
-                    string base64 = client.HexToBase64(text);
-                    byte[] fullavatar = Convert.FromBase64String(base64);
+                    byte[] fullavatar = Convert.FromBase64String(text);
                     byte[] avatar = client.Scale(fullavatar);
                     if (!client.Avatar.SequenceEqual(avatar))
                         if (Events.AvatarReceived(client))
@@ -707,7 +705,7 @@ namespace core.ib0t
                 try
                 {
                     client.PersonalMessage = arg_items[5];
-                    if (arg_items[6] != "/default.png")
+                    if (arg_items[6] != "/default.png" && !String.IsNullOrEmpty(arg_items[6]))
                     {
                         byte[] fullavatar = Convert.FromBase64String(arg_items[6]);
                         byte[] avatar = client.Scale(fullavatar);
@@ -850,9 +848,11 @@ namespace core.ib0t
                 {
                     client.QueuePacket(WebOutbound.ServerInfo(client));
                 }
-                client.QueuePacket(WebOutbound.TopicFirstTo(client, Settings.Get<String>("topic","ExtraSettings")));
-                if(!(client.IsInbizierWeb || client.IsInbizierMobile))
+                else
+                {
                     client.QueuePacket(WebOutbound.UserlistItemTo(client, Settings.Get<String>("botName", "MainSettings"), ILevel.Host));
+                }
+                client.QueuePacket(WebOutbound.TopicFirstTo(client, Settings.Get<String>("topic","ExtraSettings")));
 
                 UserPool.AUsers.ForEachWhere(x => client.QueuePacket(
                     client.IsInbizierWeb||client.IsInbizierMobile

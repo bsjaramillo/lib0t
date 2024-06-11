@@ -5,7 +5,8 @@ Servidor sb0t para distribuciones Linux.
 Es un servidor experimental, lo que significa que puede estar sujeto a fallos. Sin embargo se han realizado pruebas, las cuales han sido exitosas en la mayoría de funciones del servidor.
 
 **Problemas actuales que presenta el servidor**
-- Usuarios de cb0t/ares o clientes TCP presentan problemas al escribir, los mensajes se cortan. Este problema está asociado a la incompatibilidad de Frameworks
+- Usuarios de cb0t/ares o clientes TCP presentan problemas al escribir, los mensajes se cortan.
+- Algunos usuarios en general presentan problemas para conectarse, el servidor los rechaza.
 
 ## Requisitos
 
@@ -146,44 +147,32 @@ Primero crear la siguiente carpeta
 sudo mkdir /lib0t
 ```
 Esta carpeta contendrá todos los chatroom spaces de cada sala de chat.
+Luego elegir el nombre del **chatroom space** para la sala de chat, elegir un nombre corto y evitar usar caracteres especiales (tildes, simbolos especiales, etc), como ejemplo se creará un **chatroom space** llamado room1.
 
-Luego creamos una variable para guardar el nombre del **chatroom space** y asignamos el nombre al mismo tiempo para la sala de chat, elegir un nombre corto y evitar usar caracteres especiales (espacios, tildes, símbolos especiales, etc), como ejemplo se creará un **chatroom space** llamado room1.
-
+*sudo mkdir /lib0t/**chatroom space***
 ```bash
-export chatroomspace="room1"
-```
-
-Verificamos que se haya guardado (debería mostrar: room1)
-```bash
-echo $chatroomspace
-```
-*Nota: Esta variable es temporal.*
-
-
-A continuación creamos el **chatroom space**
-```bash
-sudo mkdir /lib0t/$chatroomspace
+sudo mkdir /lib0t/room1
 ```
 ### 3 Descargar archivos de configuración para la sala de chat
 Para configurar una sala de chat (nombre, puerto, etc) en Windows se utilizaba la interfaz de usuario, en las distribuciones Linux por lo general no existe o no es posible realizarlo de la misma manera. Por lo cual es necesario descargar y editar unos archivos de configuración en formato JSON.
 #### 3.1 Crear la carpeta para los archivos de configuración
 
-*sudo mkdir /lib0t/**$chatroomspace**/Settings*
+*sudo mkdir /lib0t/**chatroom space**/Settings*
 ```bash
-sudo mkdir /lib0t/$chatroomspace/Settings
+sudo mkdir /lib0t/room1/Settings
 ```
 #### 3.2 Descargar los archivos de configuración
 AppSettings.json, este archivo de configuración es necesario para la creación de la sala de chat, en este se establecen los valores o parámetros para el nombre de la sala, puerto, contraseña, habilitar para ib0t, etc.
 
-*sudo wget -O /lib0t/**$chatroomspace**/Settings/AppSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/AppSettings.json*
+*sudo wget -O /lib0t/**chatroom space**/Settings/AppSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/AppSettings.json*
 ```bash
-sudo wget -O /lib0t/$chatroomspace/Settings/AppSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/AppSettings.json
+sudo wget -O /lib0t/room1/Settings/AppSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/AppSettings.json
 ```
 CommandsSettings, este archivo de configuración es necesario en tiempo de ejecución de la sala, no es necesario editar.
 
-*sudo wget -O /lib0t/**$chatroomspace**/Settings/CommandsSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/CommandsSettings.json*
+*sudo wget -O /lib0t/**chatroom space**/Settings/CommandsSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/CommandsSettings.json*
 ```bash
-sudo wget -O /lib0t/$chatroomspace/Settings/CommandsSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/CommandsSettings.json
+sudo wget -O /lib0t/room1/Settings/CommandsSettings.json https://raw.githubusercontent.com/bsjaramillo/lib0t/main/Settings/CommandsSettings.json
 
 ```
 ### 4 Configurar la sala de chat
@@ -215,7 +204,7 @@ Scripts pueden cambiar el level => AdvancedSettings => scriptsCanChangeLevel
 ```
 Para editar este archivo ejecutar el siguiente comando
 
-*sudo nano /lib0t/**$chatroomspace**/Settings/AppSettings.json*
+*sudo nano /lib0t/**chatroom space**/Settings/AppSettings.json*
 ```bash
 sudo nano /lib0t/room1/Settings/AppSettings.json
 ```
@@ -223,11 +212,11 @@ sudo nano /lib0t/room1/Settings/AppSettings.json
 Para moverse dentro del archivo utilizar las flechas de dirección del teclado. Una vez terminado de editar el archivo guardar los cambios presionar las teclas "Ctrl+x", luego la tecla "y" y por último dar enter.
 
 ### 5 Crear la sala de chat
-En este punto recordar el **puerto** establecido en el archivo de configuración AppSettings.json. Ejecutar el siguiente comando.
+En este punto recordar el nombre del **chatroom space** elegido en el punto 1.0 y el **puerto** establecido en el archivo de configuración AppSettings.json. Ejecutar el siguiente comando.
 
-*sudo docker run -d -it -v /lib0t/**chatroomspace**:/lib0t/**chatroomspace** --name **chatroom space** -p **puerto**:**puerto** bsjaramillo/lib0t **chatroomspace***
+*sudo docker run -d -it -v /lib0t/**chatroom space**:/lib0t/**chatroom space** --name **chatroom space** -p **puerto**:**puerto** bsjaramillo/lib0t **chatroom space***
 ```bash
-sudo docker run -d -it -v /lib0t/$chatroomspace:/lib0t/$chatroomspace --name $chatroomspace -p 54321:54321 bsjaramillo/lib0t $chatroomspace
+sudo docker run -d -it -v /lib0t/room1:/lib0t/room1 --name room1 -p 54321:54321 bsjaramillo/lib0t room1
 ```
 Para verificar que la sala ha sido creada con sin problemas, ejectuar el siguiente comando.
 
@@ -241,29 +230,29 @@ Al ejecutar este comando debería visualizar un mensaje diciendo que se ha cread
 
 Para iniciar la sala de chat
 
-*sudo docker start **$chatroomspace***
+*sudo docker start **chatroom space***
 ```bash
-sudo docker start $chatroomspace
+sudo docker start room1
 ```
 Para apagar la sala de chat
 
-*sudo docker stop **$chatroomspace***
+*sudo docker stop **chatroom space***
 ```bash
-sudo docker stop $chatroomspace
+sudo docker stop room1
 ```
 
 Para eliminar la sala de chat
 
-*sudo docker stop **$chatroomspace***
+*sudo docker stop **chatroom space***
 
-*sudo docker rm **$chatroomspace***
+*sudo docker rm **chatroom space***
 ```bash
-sudo docker stop $chatroomspace
-sudo docker rm $chatroomspace
+sudo docker stop room1
+sudo docker rm room1
 ```
 Para reinciar la sala de chat, este comando se puede utilizar cuando se realiza un cambio en el archivo de configuración AppSettings.json y es necesario reinciar el servidor para aplicar los cambios.
 
-*sudo docker restart **$chatroomspace***
+*sudo docker restart **chatroom space***
 ```bash
-sudo docker restart $chatroomspace
+sudo docker restart room1
 ```

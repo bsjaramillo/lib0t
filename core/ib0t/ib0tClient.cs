@@ -27,7 +27,6 @@ using iconnect;
 using Heijden.DNS;
 using System.IO;
 using ImageMagick;
-using System.Buffers.Text;
 
 namespace core.ib0t
 {
@@ -143,23 +142,6 @@ namespace core.ib0t
                 return;
             this.QueuePacket(WebOutbound.ScribbleGifTo(this,sender, url));
         }
-
-        public string Base64ToHex(string base64)
-        {
-                byte[] bytes = Convert.FromBase64String(base64);
-                return BitConverter.ToString(bytes).Replace("-", "").ToLower();
-        }
-
-        public string HexToBase64(string hex)
-        {
-                byte[] bytes = new byte[hex.Length / 2];
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
-                }
-                return Convert.ToBase64String(bytes);
-        }
-
         public void SetLevel(ILevel level)
         {
             if (!this.LoggedIn)
@@ -647,8 +629,8 @@ namespace core.ib0t
         private byte[] rest_av = null;
         public byte[] Avatar
         {
-            get { 
-                if(this.avatar==null)
+            get {
+                if (this.avatar == null || this.avatar.Length == 0)
                     return Resource1.web;
                 return this.avatar; }
             set
@@ -678,7 +660,7 @@ namespace core.ib0t
         {
             get
             {
-                if (this.fullavatar == null)
+                if (this.fullavatar == null || this.fullavatar.Length == 0)
                     return Resource1.web;
                 return this.fullavatar;
             }
@@ -706,7 +688,7 @@ namespace core.ib0t
         }
         public byte[] Scale(byte[] raw)
         {
-            byte[] result;
+            byte[] result=null;
             try {
                 using (var avatar_raw = new MagickImage(raw))
                 {
