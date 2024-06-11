@@ -24,6 +24,7 @@ using System.IO.Compression;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using lib0t;
+using scripting.LiveScriptAPIModels;
 
 namespace scripting
 {
@@ -86,6 +87,9 @@ namespace scripting
                 try
                 {
                     WebRequest request = WebRequest.Create(String.Format("{0}/repos/{1}/releases/latest", liveScriptsEndpoint, path));
+                    request.Headers.Set("Accept", "application/vnd.github+json");
+                    request.Headers.Set("X-GitHub-Api-Version", "2022-11-28");
+                    request.Headers.Set("User-Agent", "sb0t-server");
                     using (WebResponse response = request.GetResponse())
                     using (Stream stream = response.GetResponseStream())
                     {
@@ -98,7 +102,7 @@ namespace scripting
 
                         buf = receiver.ToArray();
                         String received = Encoding.Default.GetString(buf);
-                        ReleaseResponse releaseResponse = JsonConvert.DeserializeObject<ReleaseResponse>(received);
+                        GitHubRelease releaseResponse = JsonConvert.DeserializeObject<GitHubRelease>(received);
                         urlZipRelease = releaseResponse.ZipballUrl;
                     }
                 }
@@ -114,7 +118,7 @@ namespace scripting
             bool completed = threadCompletedEvent.WaitOne(TimeSpan.FromSeconds(5));
             if (completed)
             {
-                if (urlZipRelease == "")
+                if (String.IsNullOrEmpty(urlZipRelease))
                     items.Enqueue(new LiveScriptItem
                     {
                         Type = ListScriptReceiveType.Failed,
@@ -134,7 +138,6 @@ namespace scripting
                 });
         }
 
-        
         public static void Download(String url, String filename, String pathScript)
         {
             new Thread(new ThreadStart(() =>
@@ -142,54 +145,37 @@ namespace scripting
                 try
                 {
                     WebRequest request = WebRequest.Create(url);
-
+                    request.Headers.Set("Accept", "application/vnd.github+json");
+                    request.Headers.Set("X-GitHub-Api-Version", "2022-11-28");
+                    request.Headers.Set("User-Agent", "sb0t-server");
                     using (WebResponse response = request.GetResponse())
                     using (Stream stream = response.GetResponseStream())
+                    using (ZipArchive zipArchive = new ZipArchive(stream, ZipArchiveMode.Read))
                     {
-                        List<byte> receiver = new List<byte>();
-                        byte[] buf = new byte[1024];
-                        int size = 0;
-
-                        while ((size = stream.Read(buf, 0, 1024)) > 0)
-                            receiver.AddRange(buf.Take(size));
-
-                        buf = receiver.ToArray();
-                        String received = Encoding.Default.GetString(buf);
-
-                        if (buf.Length==0)
-                            items.Enqueue(new LiveScriptItem
-                            {
-                                Type = ListScriptReceiveType.Failed,
-                                Args = pathScript
-                            });
-                        else
+                        String path = Path.Combine(Server.DataPath, filename);
+                        int index = ScriptManager.Scripts.FindIndex(x => x.ScriptName == filename + ".js");
+                        if (index > 0)
                         {
-                            int index = ScriptManager.Scripts.FindIndex(x => x.ScriptName == filename + ".js");
-                            if (index > 0)
-                            {
-                                ScriptManager.Scripts[index].KillScript();
-                                ScriptManager.Scripts.RemoveAt(index);
-                            }
-                            String pathzip = Path.Combine(Server.DataPath, filename + ".zip");
-                            String path = Path.Combine(Server.DataPath, filename);
-                            if (Directory.Exists(path + ".js"))
-                                Directory.Delete(path + ".js", true);
-                            if (File.Exists(pathzip))
-                                File.Delete(pathzip);
-                            File.WriteAllBytes(pathzip, buf);
-                            ZipFile.ExtractToDirectory(pathzip, Server.DataPath);
-                            File.Delete(pathzip);
-                            Directory.Move(path, path + ".js");
-                            items.Enqueue(new LiveScriptItem
-                            {
-                                Type = ListScriptReceiveType.ReadyLoad,
-                                Args = filename + ".js"
-                            });
+                            ScriptManager.Scripts[index].KillScript();
+                            ScriptManager.Scripts.RemoveAt(index);
                         }
+
+                        if (Directory.Exists(path + ".js"))
+                            Directory.Delete(path + ".js", true);
+                        ZipArchiveEntry content = zipArchive.Entries.First();
+                        String responsePath = Path.Combine(Server.DataPath, content.FullName.Replace("/", ""));
+                        zipArchive.ExtractToDirectory(Server.DataPath);
+                        Directory.Move(responsePath, path + ".js");
+                        items.Enqueue(new LiveScriptItem
+                        {
+                            Type = ListScriptReceiveType.ReadyLoad,
+                            Args = filename + ".js"
+                        });
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
+                    System.Diagnostics.Debug.WriteLine(e);
                     items.Enqueue(new LiveScriptItem
                     {
                         Type = ListScriptReceiveType.Failed,
@@ -198,42 +184,46 @@ namespace scripting
                 }
             })).Start();
         }
+
         public static void LiveScripts(IUser target)
         {
             new Thread(new ThreadStart(() =>
             {
                 try
                 {
-                    WebRequest request = WebRequest.Create(String.Format("{0}/repos/search?private=false&is_private=false&archived=false", liveScriptsEndpoint));
+                    WebRequest request = WebRequest.Create(String.Format("{0}/search/repositories?q=topic:areschatscript+is:public", liveScriptsEndpoint));
+                    request.Headers.Set("Accept", "application/vnd.github+json");
+                    request.Headers.Set("X-GitHub-Api-Version", "2022-11-28");
+                    request.Headers.Set("User-Agent", "sb0t-server");
                     using (WebResponse response = request.GetResponse())
                     using (Stream stream = response.GetResponseStream())
                     {
                         List<byte> receiver = new List<byte>();
                         byte[] buf = new byte[1024];
                         int size = 0;
-
                         while ((size = stream.Read(buf, 0, 1024)) > 0)
                             receiver.AddRange(buf.Take(size));
 
                         buf = receiver.ToArray();
                         String result = Encoding.Default.GetString(buf);
-                        ApiResponse apiResponse = JsonConvert.DeserializeObject<ApiResponse>(result);
-                        target.Print(String.Format("Scripts Repo: {0}/explore/repos", ExtractDomain(liveScriptsEndpoint)));
-                        if (apiResponse.Ok)
+                        GitHubSearchResponse apiResponse = JsonConvert.DeserializeObject<GitHubSearchResponse>(result);
+                        if (apiResponse != null)
                         {
-                            if (apiResponse.Data.Count == 0)
+                            if (apiResponse.Items.Count == 0)
                                 target.Print("No scripts available");
-                            apiResponse.Data.ForEach(x =>
+                            apiResponse.Items.ForEach(x =>
                             {
-                                if (x.ReleaseCounter > 0)
-                                    target.Print(String.Format("\x06Script: \x06{0}  \x06 Author: \x06{1}  \x06Path: \x06{2}  \x06 Description: \x06{3}", x.Name, x.Owner.Username, x.FullName, x.Description));
+                                if (!x.IsPrivate)
+                                    target.Print(String.Format("\x06Script: \x06{0}  \x06 Author: \x06{1}  \x06Path: \x06{2}  \x06 Description: \x06{3}", x.Name, x.Owner.Login, x.FullName, x.Description));
                             });
                         }
                         else
                             target.Print("Unable to get live scripts list");
                     }
                 }
-                catch (Exception e){
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine(e);
                     target.Print("Unable to get live scripts list");
                 }
             })).Start();

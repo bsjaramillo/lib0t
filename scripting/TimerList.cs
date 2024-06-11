@@ -22,6 +22,7 @@ using System.Linq;
 using System.Text;
 using Jurassic;
 using Jurassic.Library;
+using Jurassic.Compiler;
 
 namespace scripting
 {
@@ -62,6 +63,12 @@ namespace scripting
                                 }
                                 catch (JavaScriptException e)
                                 {
+                                    Server.Print(String.Format("Unable to run timer {0} \x06{1} - LineReference: {2}", timer.ScriptName, e.Message, e.LineNumber));
+                                    ErrorDispatcher.SendError(timer.ScriptName, e.Message, e.LineNumber);
+                                }
+                                catch (SyntaxErrorException e)
+                                {
+                                    Server.Print(String.Format("Unable to run timer {0} \x06{1} - LineReference: {2}", timer.ScriptName, e.Message, e.LineNumber));
                                     ErrorDispatcher.SendError(timer.ScriptName, e.Message, e.LineNumber);
                                 }
                                 catch { }
